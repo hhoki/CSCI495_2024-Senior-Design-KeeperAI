@@ -53,7 +53,6 @@ class Book {
 
   static async deleteById(id) {
     const tableName = 'books';
-    const careplanTableName = 'careplan';
     try {
       ;
     } catch (error) {
