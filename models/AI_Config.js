@@ -53,7 +53,6 @@ class AI_Config {
 
   static async deleteById(id) {
     const tableName = 'model_configurations';
-    const careplanTableName = 'careplan';
     try {
       ;
     } catch (error) {
