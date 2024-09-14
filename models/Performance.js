@@ -53,7 +53,6 @@ class Performance {
 
   static async deleteById(id) {
     const tableName = 'ai_performance';
-    const careplanTableName = 'careplan';
     try {
       ;
     } catch (error) {
