@@ -52,7 +52,6 @@ class Detection {
 
   static async deleteById(id) {
     const tableName = 'book_detections';
-    const careplanTableName = 'careplan';
     try {
       ;
     } catch (error) {
