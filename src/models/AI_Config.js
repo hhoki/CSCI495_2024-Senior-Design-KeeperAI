@@ -1,74 +1,70 @@
 const db = require("../config/db");
 
-class Performance {
-  constructor(performance_id, model_used, detection_count, accuracy, avg_response_time, session_time) {
-    this.performance_id = performance_id;
+class AI_Config {
+  constructor(config_id, model_used, version, config_params) {
+    this.config_id = config_id;
     this.model_used = model_used;
-    this.detection_count = detection_count;
-    this.accuracy = accuracy;
-    this.avg_response_time = avg_response_time;
-    this.session_time = session_time;
+    this.version = version;
+    this.config_params = config_params;
   }
 
   async save() {
     try {
       const sql = `
-        INSERT INTO ai_performance(
-          performance_id, model_used, detection_count, accuracy, avg_response_time, session_time
+        INSERT INTO model_configurations(
+          config_id, model_used, version, config_params
         )
         VALUES (?, ?, ?, ?)
       `;
-      const values = [this.performance_id, this.model_used, this.detection_count, this.accuracy, this.avg_response_time, this.session_time];
+      const values = [this.config_id, this.model_used, this.version, this.config_params];
       
       const [result] = await db.execute(sql, values);
       return result.insertId;
     } catch (error) {
-      throw new Error(`Error saving ai_performance: ${error.message}`);
+      throw new Error(`Error saving config: ${error.message}`);
     }
   }
 
   static async findAll() {
     try {
-        const sql = "SELECT * FROM ai_performance";
-        const [rows] = await db.execute(sql);
-        return rows;
+      const sql = "SELECT * FROM model_configurations";
+      const [rows] = await db.execute(sql);
+      return rows;
     } catch (error) {
-      throw new Error(`Error fetching all metrics: ${error.message}`);
+      throw new Error(`Error fetching all configs: ${error.message}`);
     }
   }
 
   static async findById(id) {
     try {
-        const sql = "SELECT * FROM ai_performance WHERE id = ?";
-        const [rows] = await db.execute(sql, [id]);
-        return rows[0];
+      const sql = "SELECT * FROM model_configurations WHERE id = ?";
+      const [rows] = await db.execute(sql, [id]);
+      return rows[0];
     } catch (error) {
-      throw new Error(`Error fetching ai_performance by id: ${error.message}`);
+      throw new Error(`Error fetching config by id: ${error.message}`);
     }
   }
 
   async update() {
     try {
-        const sql = `
-        UPDATE books
-        SET performance_id = ?,
+      const sql = `
+        UPDATE model_configurations
+        SET config_id = ?,
             model_used = ?,
-            detection_count = ?,
-            accuracy = ?,
-            avg_response_time = ?,
-            session_time = ?
+            version = ?,
+            config_params = ?
         WHERE id = ?
       `;
-      const values = [this.performance_id, this.model_used, this.detection_count, this.accuracy, this.avg_response_time, this.session_time];
+      const values = [this.config_id, this.model_used, this.version, this.config_params];
       
       await db.execute(sql, values);
     } catch (error) {
-      throw new Error(`Error updating ai_performance: ${error.message}`);
+      throw new Error(`Error updating config: ${error.message}`);
     }
   }
 
   static async deleteById(id) {
-    const tableName = 'ai_performance';
+    const tableName = 'model_configurations';
     try {
       // Delete the row
       const deleteQuery = `DELETE FROM ${tableName} WHERE id = ?`;
@@ -85,8 +81,8 @@ class Performance {
   }
 
   static async reindexTable() {
-    const tableName = 'ai_performance'; 
-    try {
+    const tableName = 'model_configurations'; 
+        try {
       // Get all rows from the table sorted by ID
       const query = `SELECT * FROM ${tableName} ORDER BY id`;
       const [rows] = await db.execute(query);
@@ -107,4 +103,4 @@ class Performance {
 
 }
 
-module.exports = Performance;
+module.exports = AI_Config;

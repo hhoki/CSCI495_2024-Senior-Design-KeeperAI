@@ -1,78 +1,80 @@
 const db = require("../config/db");
 
-class Performance {
-  constructor(performance_id, model_used, detection_count, accuracy, avg_response_time, session_time) {
-    this.performance_id = performance_id;
+class Detection {
+  constructor(detection_id, detection_time, image_path, model_used, book_id) {
+    this.detection_id = detection_id;
+    this.detection_time = detection_time;
+    this.image_path = image_path;
     this.model_used = model_used;
-    this.detection_count = detection_count;
-    this.accuracy = accuracy;
-    this.avg_response_time = avg_response_time;
-    this.session_time = session_time;
+    this.book_id = book_id;
   }
 
   async save() {
     try {
       const sql = `
-        INSERT INTO ai_performance(
-          performance_id, model_used, detection_count, accuracy, avg_response_time, session_time
+        INSERT INTO book_detections(
+          detection_id, detection_time, image_path, model_used, book_id
         )
-        VALUES (?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?)
       `;
-      const values = [this.performance_id, this.model_used, this.detection_count, this.accuracy, this.avg_response_time, this.session_time];
+      const values = [this.detection_id, this.detection_time, this.image_path, this.model_used, this.book_id];
       
       const [result] = await db.execute(sql, values);
       return result.insertId;
     } catch (error) {
-      throw new Error(`Error saving ai_performance: ${error.message}`);
+      throw new Error(`Error saving book_detections: ${error.message}`);
     }
   }
 
   static async findAll() {
     try {
-        const sql = "SELECT * FROM ai_performance";
-        const [rows] = await db.execute(sql);
-        return rows;
+      const sql = "SELECT * FROM book_detections";
+      const [rows] = await db.execute(sql);
+      return rows;
     } catch (error) {
-      throw new Error(`Error fetching all metrics: ${error.message}`);
+      throw new Error(`Error fetching all book_detections: ${error.message}`);
     }
   }
 
   static async findById(id) {
     try {
-        const sql = "SELECT * FROM ai_performance WHERE id = ?";
-        const [rows] = await db.execute(sql, [id]);
-        return rows[0];
+      const sql = "SELECT * FROM book_detections WHERE id = ?";
+      const [rows] = await db.execute(sql, [id]);
+      return rows[0];
     } catch (error) {
-      throw new Error(`Error fetching ai_performance by id: ${error.message}`);
+      throw new Error(`Error fetching book_detections by id: ${error.message}`);
     }
   }
 
   async update() {
     try {
-        const sql = `
+      const sql = `
         UPDATE books
-        SET performance_id = ?,
+        SET detection_id = ?,
+            detection_time = ?,
+            image_path = ?,
             model_used = ?,
-            detection_count = ?,
-            accuracy = ?,
-            avg_response_time = ?,
-            session_time = ?
+            book_id,
         WHERE id = ?
       `;
-      const values = [this.performance_id, this.model_used, this.detection_count, this.accuracy, this.avg_response_time, this.session_time];
+      const values = [this.detection_id, this.detection_time, this.image_path, this.model_used, this.book_id];
       
       await db.execute(sql, values);
     } catch (error) {
-      throw new Error(`Error updating ai_performance: ${error.message}`);
+      throw new Error(`Error updating book_detections: ${error.message}`);
     }
   }
 
   static async deleteById(id) {
-    const tableName = 'ai_performance';
+    const tableName = 'book_detections';
+    const bookTableName = 'books';
     try {
       // Delete the row
       const deleteQuery = `DELETE FROM ${tableName} WHERE id = ?`;
-
+      const deleteBookQuery = `DELETE FROM ${bookTableName} WHERE book_detections = ?`;
+      
+      
+      await db.execute(deleteBookQuery, [id]);
       await db.execute(deleteQuery, [id]);
 
       // Re-index the table
@@ -85,7 +87,7 @@ class Performance {
   }
 
   static async reindexTable() {
-    const tableName = 'ai_performance'; 
+    const tableName = 'book_detections'; 
     try {
       // Get all rows from the table sorted by ID
       const query = `SELECT * FROM ${tableName} ORDER BY id`;
@@ -107,4 +109,4 @@ class Performance {
 
 }
 
-module.exports = Performance;
+module.exports = Detection;
