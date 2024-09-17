@@ -82,20 +82,37 @@ DROP TABLE IF EXISTS `books`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `books` (
   `books_id` int NOT NULL,
+  `shelfs_id` int NOT NULL,
   `title` varchar(225) NOT NULL,
   `author` varchar(225) NOT NULL,
+  `published_date` varchar(225) NOT NULL,
   `isbn` varchar(20) NOT NULL,
+  `rating` varchar(45) DEFAULT NULL,
+  `description` TEXT DEFAULT NULL,
+  `cover` varchar(255) DEFAULT NULL,
   `shelf_location` varchar(45) DEFAULT NULL,
   `date_added` datetime DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`books_id`),
   UNIQUE KEY `Bookscol_UNIQUE` (`shelf_location`) /*!80000 INVISIBLE */,
-  KEY `book_id` (`books_id`)
+  KEY `books_id` (`books_id`)
+  KEY `shelf_id` (`shelf_id`),
+  CONSTRAINT `shelf_id` FOREIGN KEY (`shelf_id`) REFERENCES `shelf` (`shelf_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Dumping data for table `books`
 --
+
+CREATE TABLE `shelfs` (
+  `shelfs_id` int NOT NULL AUTO_INCREMENT,
+  `shelfs_name` varchar(100) DEFAULT NULL,
+  `shelfs_description` TEXT DEFAULT NULL,
+  PRIMARY KEY (`shelf_id`),
+
+)
+
+
 
 LOCK TABLES `books` WRITE;
 /*!40000 ALTER TABLE `books` DISABLE KEYS */;

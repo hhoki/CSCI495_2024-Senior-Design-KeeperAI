@@ -1,11 +1,16 @@
 const db = require("../config/db");
 
 class Book {
-  constructor(books_id, title, author, isbn, shelf_location ) {
+  constructor(books_id, shelfs_id, title, author, published_date, isbn, rating, description, cover, shelf_location ) {
     this.books_id = books_id;
+    this.shelfs_id = shelfs_id;
     this.title = title;
     this.author = author;
+    this.published_date = published_date;
     this.isbn = isbn;
+    this.rating = rating;
+    this.description = description;
+    this.cover = cover;
     this.shelf_location = shelf_location;
   }
 
@@ -13,11 +18,11 @@ class Book {
     try {
       const sql = `
         INSERT INTO books(
-          books_id, title, author, isbn, shelf_location
+          books_id, shelfs_id, title, author, published_date, isbn, rating, description, cover, shelf_location
         )
-        VALUES (?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `;
-      const values = [this.books_id, this.title, this.author, this.isbn, this.shelf_location];
+      const values = [this.books_id,this.shelfs_id, this.title, this.author, this.published_date, this.isbn, this.rating, this.description, this.cover, this.shelf_location];
       
       const [result] = await db.execute(sql, values);
       return result.insertId;
@@ -51,13 +56,17 @@ class Book {
       const sql = `
         UPDATE books
         SET books_id = ?,
+            shelfs_id = ?,
             title = ?,
             author = ?,
+            published_date = ?,
             isbn = ?,
+            rating = ?,
+            cover = ?,
             shelf_location,
         WHERE id = ?
       `;
-      const values = [this.books_id, this.title, this.author, this.isbn, this.shelf_location];
+      const values = [this.books_id,this.shelfs_id, this.title, this.author, this.published_date, this.isbn, this.rating, this.description, this.cover, this.shelf_location];
       
       await db.execute(sql, values);
     } catch (error) {
