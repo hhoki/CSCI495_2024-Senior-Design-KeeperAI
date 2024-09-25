@@ -13,7 +13,7 @@ exports.getAllBooks = async (req, res, next) => {
   exports.createBook = async (req, res, next) => {
     try {
         const {books_id, shelfs_id, title, author, published_date, isbn, rating, description, cover, shelf_location } = req.body;
-        const books = new Bookbooks_id, shelfs_id, title, author, published_date, isbn, rating, description, cover, shelf_location);
+        const books = new Book (books_id, shelfs_id, title, author, published_date, isbn, rating, description, cover, shelf_location);
         await books.save();
         res.status(201).json({ message: "Book created" });
     } catch (error) {
