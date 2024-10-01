@@ -4,7 +4,7 @@ const Detection = require('../models/Detection');
 exports.getAllDetections = async (req, res, next) => {
     try {
     const detections = await Detection.findAll();
-    res.status(200).json({ count: detections.length, configs });
+    res.status(200).json({ count: detections.length, detections });
     } catch (error) {
       next(error);
     }

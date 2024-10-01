@@ -4,7 +4,7 @@ const Metric = require('../models/Performance');
 exports.getAllMetrics = async (req, res, next) => {
   try {
     const metrics = await Metric.findAll();
-    res.status(200).json({ count: metrics.length, configs });
+    res.status(200).json({ count: metrics.length, metrics });
   } catch (error) {
     next(error);
   }
