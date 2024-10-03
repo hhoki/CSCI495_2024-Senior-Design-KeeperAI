@@ -94,9 +94,8 @@ CREATE TABLE `books` (
   `date_added` datetime DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`books_id`),
   UNIQUE KEY `Bookscol_UNIQUE` (`shelf_location`) /*!80000 INVISIBLE */,
-  KEY `books_id` (`books_id`)
-  KEY `shelf_id` (`shelf_id`),
-  CONSTRAINT `shelf_id` FOREIGN KEY (`shelf_id`) REFERENCES `shelf` (`shelf_id`)
+  KEY `shelfs_id` (`shelfs_id`),
+  CONSTRAINT `shelfs_id` FOREIGN KEY (`shelfs_id`) REFERENCES `shelfs` (`shelfs_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -104,13 +103,18 @@ CREATE TABLE `books` (
 -- Dumping data for table `books`
 --
 
+
+/* Table structure for `shelfs` */
+DROP TABLE IF EXISTS `shelfs`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `shelfs` (
   `shelfs_id` int NOT NULL AUTO_INCREMENT,
   `shelfs_name` varchar(100) DEFAULT NULL,
   `shelfs_description` TEXT DEFAULT NULL,
-  PRIMARY KEY (`shelf_id`),
+  PRIMARY KEY (`shelfs_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-)
 
 
 
