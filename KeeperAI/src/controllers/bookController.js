@@ -31,26 +31,29 @@ exports.getAllBooks = async (req, res, next) => {
   }
 };
 
-exports.createBook = async (req, res, next) => {
-  try {
-    const { books_id, shelfs_id, title, author, published_date, isbn, rating, description, cover, shelf_location } = req.body;
-    const books = new { books_id, shelfs_id, title, author, published_date, isbn, rating, description, cover, shelf_location };
-    await books.save();
-    res.status(201).json({ message: "Book created" });
-  } catch (error) {
-    next(error);
-  }
-};
+  
+  exports.createBook = async (req, res, next) => {
+    try {
+        const {books_id, shelfs_id, title, author, published_date, isbn, rating, description, cover, shelf_location } = req.body;
+        const books = new Book (books_id, shelfs_id, title, author, published_date, isbn, rating, description, cover, shelf_location);
+        await books.save();
+        res.status(201).json({ message: "Book created" });
+    } catch (error) {
+      next(error);
+    }
+  };
+  
+  exports.getBookById = async (req, res, next) => {
+    try {
+      const bookID = req.params.id;
+      const book = await Book.findById(bookID);
+      res.status(200).json({ book });
+    } catch (error) {
+      next(error);
+    }
+  };
+  
 
-exports.getBookById = async (req, res, next) => {
-  try {
-    const bookID = req.params.id;
-    const book = await Book.findById(bookID);
-    res.status(200).json({ book });
-  } catch (error) {
-    next(error);
-  }
-};
 
 exports.updateBookById = async (req, res, next) => {
   try {
