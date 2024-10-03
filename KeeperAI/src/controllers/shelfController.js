@@ -25,7 +25,7 @@ exports.getAllShelfs = async (req, res, next) => {
   exports.createShelf = async (req, res, next) => {
     try {
         const {shelf_id, shelf_name, shelf_description} = req.body;
-        const shelfs = new (shelf_id, shelf_name, shelf_description);
+        const shelfs = new Shelf(shelf_id, shelf_name, shelf_description);
         await shelfs.save();
         res.status(201).json({ message: "Shelf created" });
     } catch (error) {
