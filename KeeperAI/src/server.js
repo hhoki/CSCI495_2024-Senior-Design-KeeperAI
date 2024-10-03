@@ -12,6 +12,7 @@ app.use("/books", require("./routes/bookRoutes"));
 app.use("/ai_performance", require("./routes/performanceRoutes"));
 app.use("/model_configurations", require("./routes/aiConfigRoutes"));
 app.use("/detections", require("./routes/detectionRoutes"));
+app.use("/shelf", require("./routes/shelfRoutes"));
 
 app.use((err, req, res, next) => {
     console.log(err.stack);

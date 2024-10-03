@@ -1,5 +1,17 @@
 const axios = require('axios');
-const Book = require('../models/Book');
+const fs = require('fs');
+const path = require('path');
+const Book = require('../models/Shelf');
+
+exports.detectShelf = async (req, res) => {
+  try {
+    
+  } catch (error) {
+      console.error('Error during book detection:', error);
+      res.status(500).json({ message: 'Failed to detect books from the image.' });
+  }
+};
+
 
 exports.getAllShelfs = async (req, res, next) => {
     try {
@@ -12,8 +24,8 @@ exports.getAllShelfs = async (req, res, next) => {
   
   exports.createShelf = async (req, res, next) => {
     try {
-        const {shelf_id, shelf_name, shelf_description } = req.body;
-        const shelfs = new shelf_id, shelf_name, shelf_description);
+        const {shelf_id, shelf_name, shelf_description} = req.body;
+        const shelfs = new Shelf(shelf_id, shelf_name, shelf_description);
         await shelfs.save();
         res.status(201).json({ message: "Shelf created" });
     } catch (error) {
