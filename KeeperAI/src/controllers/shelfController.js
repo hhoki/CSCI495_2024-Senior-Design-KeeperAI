@@ -5,27 +5,7 @@ const Book = require('../models/Shelf');
 
 exports.detectShelf = async (req, res) => {
   try {
-    const filePath = req.file.path; // Assuming you're using a middleware like multer for file uploads
-        const fileStream = fs.createReadStream(filePath);
-
-        // Upload the file using Axios
-        const uploadResponse = await axios.post('https://api.genai.com/upload', fileStream, {
-            headers: {
-                'Content-Type': 'multipart/form-data'
-            }
-        });
-
-        const myfile = uploadResponse.data;
-
-        // Generate content using Axios
-        const generateResponse = await axios.post('https://api.genai.com/generate', {
-            model: 'gemini-1.5-flash',
-            inputs: [myfile, "\n\n", "Can you tell me about the instruments in this photo?"]
-        });
-
-        const resultText = generateResponse.data.text;
-
-        res.json({ result: resultText });
+    
   } catch (error) {
       console.error('Error during book detection:', error);
       res.status(500).json({ message: 'Failed to detect books from the image.' });
