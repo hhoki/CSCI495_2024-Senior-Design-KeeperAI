@@ -1,43 +1,29 @@
-// script.js
-import React, { useState, useEffect } from 'react';
+function addButton() {
+    const navbar = document.getElementById('myNavbar');
+    const newButton = document.createElement('button');
+    const buttonText = prompt('Enter button text:');
+    if (buttonText) {
+        newButton.textContent = buttonText;
+        newButton.onclick = function() { removeButton(this); };
+        navbar.insertBefore(newButton, document.getElementById('addButton'));
+    }
+}
 
-const Navbar = () => {
-    const [activeIndex, setActiveIndex] = useState(null);
+function removeButton(button) {
+    if (confirm('Are you sure you want to remove this button?')) {
+        button.remove();
+    }
+}
 
-    const toggleDropdown = (index) => {
-        setActiveIndex(activeIndex === index ? null : index);
-    };
+function addCard() {
+    const grid = document.getElementById('cardGrid');
+    const newCard = document.createElement('div');
+    newCard.className = 'card';
+    newCard.textContent = 'Card ' + (grid.children.length + 1);
+    grid.appendChild(newCard);
+}
 
-    const handleClickOutside = (event) => {
-        if (activeIndex !== null) {
-            setActiveIndex(null);
-        }
-    };
-
-    useEffect(() => {
-        document.addEventListener('click', handleClickOutside);
-        return () => {
-            document.removeEventListener('click', handleClickOutside);
-        };
-    }, [activeIndex]);
-
-    return (
-        <nav>
-            <ul>
-                {[...Array(5)].map((_, index) => (
-                    <li key={index} className="nav-item" onClick={(e) => { e.stopPropagation(); toggleDropdown(index); }}>
-                        Item {index + 1}
-                        {activeIndex === index && (
-                            <div className="dropdown-menu" style={{ display: 'block' }}>
-                                Dropdown Content
-                            </div>
-                        )}
-                    </li>
-                ))}
-            </ul>
-        </nav>
-    );
-};
-
-export default Navbar;
-
+// Add initial cards
+for (let i = 0; i < 12; i++) {
+    addCard();
+}

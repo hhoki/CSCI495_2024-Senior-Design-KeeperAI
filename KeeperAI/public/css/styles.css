@@ -3,242 +3,283 @@
 */
 /* styles.css */
 body {
-    font-family: Arial, sans-serif;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
     margin: 0;
     height: 100%;
-    padding-top: 60px;
 }
 
 header {
-    background-image: linear-gradient(to top right, #5390a9, #95b4a2);
-    color: #fff;
-    padding: 30px 0;
-    position: fixed; 
+  background-image: linear-gradient(to top right, #5390a9, #95b4a2);
+  color: #fff;
+  padding: 0px 0;
+  position: sticky; 
+  top: 0;
+  left: 0;
+  width: 100%; 
+  z-index: 4;
+}
+
+.layout-container {
+  display: flex;
+  height: 100%;
+}
+
+.topnav {
+    position: sticky;
     top: 0;
-    left: 0;
-    width: 100%; 
-    z-index: 3; 
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); 
-}
-
-.header-sticky {
+    background-color: #efefef;
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+  }
+
+  .topnav-section {
+    display: flex;
     align-items: center;
-    max-width: 1500px;
-    margin: 0 auto;
-    padding: 0 20px;
-    position: relative;
-}
+  }
+  
 
-.logo {
-    position: absolute; 
+  .topnav-center {
+    position: absolute;
     left: 50%;
-    transform: translateX(-50%); 
+    transform: translateX(-50%);
+  }
+
+  .topnav-left {
+    display: flex;
+    justify-content: flex-start;
+  }
+
+  .topnav-right {
+    display: flex;
+    margin-left: auto;
+    justify-content: flex-end;
+  }
+
+
+  .topnav a {
+    color: #000000;
+    text-align: center;
+    padding: 15px 15px;
+    text-decoration: none;
+    font-size: 17px;
+  }
+  
+  .topnav .logo {
+    color: #000000;
+    text-align: center;
+    padding: 2px 8px;
+    text-decoration: none;
+    font-size: 17px;
+  }
+
+  .topnav::after {
+    content: "";
+    clear: both;
+    display: table;
+  }
+  
+
+/* Add a red background color to navbar links on hover */
+.topnav a:hover{
+  background-color: #ddd;
+  border-radius: 60px;
+  color: black;
 }
 
-.logo a {
-    color: #52431c;
-    text-decoration: none;
-    font-size: 140%;
-    font-weight: bold;
+/* The dropdown container */
+.dropdown {
+  overflow: hidden;
+}
+
+/* Dropdown button */
+.dropdown .dropbtn {
+  font-size: 16px;
+  border: none;
+  outline: none;
+  color: white;
+  padding: 15px 15px;
+  background-color: inherit;
+  font-family: inherit; /* Important for vertical align on mobile phones */
+  margin: 0; /* Important for vertical align on mobile phones */
+}
+
+.dropdown:hover .dropbtn {
+  background-color: #ddd;
+  border-radius: 60px;
+  color: black;
+}
+
+/* Dropdown content (hidden by default) */
+.dropdown-content {
+  display: none;
+  right: 0px;
+  position: absolute;
+  background-color: #f9f9f9;
+  min-width: 160px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  z-index: 1;
+}
+
+/* Links inside the dropdown */
+.dropdown-content a {
+  float: none;
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  border-radius: 5px;
+  display: block;
+  text-align: left;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Add a grey background color to dropdown links on hover */
+.dropdown-content a:hover {
+  background-color: #ddd;
+  border-radius: 3px;
+  color: black;
+}
+
+/* Show the dropdown menu on hover */
+.dropdown:hover .dropdown-content {
+  display: block;
 }
 
 .search-bar {
-    position: absolute;
-    right: 10px;
+  float: left;
+  padding: 15px 10px;
+  position: relative;
 }
 
 .search-bar form {
-    display: flex;
-    align-items: center;
+  display: flex;
+  align-items: center;
+  
 }
 
 .search-bar input[type="text"] {
-    padding: 5px;
-    border: 1px solid #ccc;
-    border-radius: 4px 0 0 4px;
-    font-size: 14px;
-    width: 200px;
+  padding: 5px;
+  color: #ffffff;
+  outline: #737373;
+  background-color: #3c3c3c;
+  border: 1px solid #353535;
+  border-radius: 15px 0px 0px 15px;
+  font-size: 14px;
+  width: 250px;
+  height: 24px;
 }
 
 .search-bar button {
-    padding: 5px 5px;
-    border: 1px solid #ccc;
-    border-left: none;
-    background-color: #5390a5;
-    color: #fff;
-    font-size: 14px;
-    cursor: pointer;
-    border-radius: 0 4px 4px 0;
+  padding: 9px 9px;
+  border: 0px solid #ccc;
+  border-left: none;
+  background-color: #6d6d6d;
+  color: #fff;
+  font-size: 14px;
+  cursor: pointer;
+  border-radius: 0 15px 15px 0;
 }
 
 .search-bar button:hover {
-    background-color: #0056b3;
+  background-color: #4f4f4f;
 }
 
-nav {
-    background-image: linear-gradient(to bottom left, #5390a5, #95b4a2);
-    padding: 10px;
-    width: 75px;
-    margin-top: -60px;
-    position: fixed;
-    z-index: 4;
+.side-navbar {
+  width: 75px;
+  background-color: #eaeaea;
+  height: 100%;
+  overflow-y: auto;
+  position: fixed;
+  top: 60px;
+  left: 0;
+  z-index: 2;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  
+}
+.side-navbar button {
+  display: block;
+  width: 100%;
+  color: rgb(55, 51, 51);
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+  font-size: 19px;
+  border: none;
+  background-color: inherit;
+  cursor: pointer;
+  
+}
+.side-navbar button:hover {
+  background-color: #d8d9db;
+}
+#addButton {
+  position: sticky;
+  bottom: 0;
+}
+.content {
+  margin-left: 70px;
+  margin-top: 0px;
+  padding: 0px;
+  flex-grow: 1;
+  overflow-y: auto;
+  z-index: 1;
+}
+.content-area {
+  padding: 20px;
+  overflow-y: auto;
 }
 
-.nav-menu {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    width: 20%;
-    height: 1000px;
+.card-grid {
+  margin-top: 20px;
+  margin-left: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+}
+.card {
+  background-color: #f0f0f0;
+  border-radius: 8px;
+  height: 300px;
+  width: 200px;
+  padding: 5px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+@media (max-width: 768px) {
+  .navbar {
+      width: 100px;
+  }
+  .content {
+      margin-left: 100px;
+  }
+}
+@media (max-width: 480px) {
+  body {
+      flex-direction: column;
+  }
+  .navbar {
+      height: auto;
+      width: 100%;
+      position: static;
+  }
+  .content {
+      margin-left: 0;
+  }
+  .card-grid {
+      grid-template-columns: 1fr;
+  }
 }
 
-.nav-profile > a {
-    position: relative;
-    margin: 100%;
-}
-
-.nav-item {
-    position: relative;
-    display: inline-block;
-    /*background-image: url('https://png.pngtree.com/thumb_back/fh260/background/20230617/pngtree-minimalistic-concept-blue-and-yellow-wall-with-empty-bookshelf-in-3d-image_3636762.jpg');
-    */
-    box-shadow: 1px 10px 150px 50px rgba(0, 0, 0, 0);
-    background-position: center; /* Center the background image */
-    background-repeat: repeat ;
-    background-attachment:local;
-    background-size: 1100%;
-    background-position-y: -50px;
-    background-position-x: 700px;
-}
-
-.nav-item > a {
-    color: #fff;
-    padding: 10px 10px;
-    padding-top: 40px;
-    text-decoration: none;
-    display: block;
-    padding-bottom: 40%;
-}
-
-.nav-item > a:hover {
-    background-color: #e68804;
-    width: 65px;
-}
-
-.dropdown-menu {
-    display: none;
-    position: absolute;
-    top: 0%;
-    left: 85px;
-    background-color: #ee9972;
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    min-width: 16px;
-}
-
-.dropdown-menu li {
-    border-bottom: 1px solid #444;
-}
-
-.dropdown-menu li:last-child {
-    border-bottom: none;
-}
-
-.dropdown-menu a {
-    color: #fff;
-    padding: 10px 20px;
-    text-decoration: none;
-    display: block;
-}
-
-.dropdown-menu a:hover {
-    background-color: #575757;
-}
-
-.nav-item:hover .dropdown-menu {
-    display: block;
-}
-
-.shelves {
-    padding-left: 65px;
-}
-
-.carousel-container {
-    width: 108%;
-    max-width: 1450px;
-    overflow-y: hidden; /* Hide overflow to create a sliding effect */
-    overflow-x: hidden;
-    white-space: nowrap;
-    box-sizing: border-box;
-    padding:60px; /* Optional: Add padding for aesthetics */
-    /*background-image: url('https://www.shutterstock.com/image-photo/wooden-book-shelf-blank-board-260nw-1381131713.jpg'); /* URL of your background image */
-    background-image: url('https://img.clipart-library.com/2/clip-empty-shelf/clip-empty-shelf-0.jpg');
-    box-shadow: 1px 10px 150px 50px rgba(0, 0, 0, 0.3);
-    background-position: center; /* Center the background image */
-    background-repeat: repeat ;
-    background-attachment:local;
-    background-size: 125%;
-    background-position-y: -60px;
-    background-position-x: -165px;
-}
-
-.carousel {
-    display: inline-flex;
-    white-space: nowrap;
-    transition: transform 0.5s ease;
-}
-
-.carousel-item {
-    display: inline-block;
-    min-width: 170px; /* Base width of each box */
-    height: 250px; /* Height of each box */
-    background-image: linear-gradient(to top right, #95b4a2,#5390a9);
-    color: #fff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 10px; /* Spacing between boxes */
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;  /* Smooth transition for scaling */
-    transform: scale(1); /* Default size */
-}
-s
-.carousel-item:hover {
-    transform: scale(1.2); /* Scale the hovered item up */
-    z-index: 2; /* Ensure the enlarged item appears above others */
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4); 
-}
-
-
-/* Content for Contact page*/
-.contact-main {
-    background-image: linear-gradient(to top right, #9ab5a6, #357b70);
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    height: 603px;
-    margin-left: 95px;
-    padding : 20px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
-
-.contact-item {
-    margin: 10px 0;
-}
-
-.contact-item a {
-    text-decoration: none;
-    color: #1a599c; /* Link color */
-    font-weight: bold;
-}
-
-.contact-item a:hover {
-    
-    text-decoration: underline; /* Underline on hover */
+.top-navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50px;
+  background-color: #2c3e50;
+  color: white;
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  z-index: 1000;
 }
