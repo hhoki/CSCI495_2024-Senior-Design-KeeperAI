@@ -16,7 +16,24 @@
             const newCard = document.createElement('div');
             newCard.className = 'card';
             const cardNumber = cardGrid.children.length + 1;
-            newCard.textContent = 'Book ' + cardNumber;
+            
+            // Create the main content div
+            const cardContent = document.createElement('div');
+            cardContent.className = 'card-content';
+            
+            // Create the overlay div
+            const overlay = document.createElement('div');
+            overlay.className = 'card-overlay';
+            overlay.innerHTML = `
+                <h3>Book ${cardNumber}</h3>
+                <p>Author: Example Author</p>
+                <p>Rating: ★★★★☆</p>
+            `;
+            
+            // Add content and overlay to the card
+            newCard.appendChild(cardContent);
+            newCard.appendChild(overlay);
+            
             newCard.setAttribute('draggable', 'true');
             
             // Add event listeners
@@ -178,6 +195,48 @@
                 addBooksModal.style.display = 'none';
             }
         }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const dropdowns = document.querySelectorAll('.dropdown');
+            
+            dropdowns.forEach(dropdown => {
+                const button = dropdown.querySelector('.dropbtn');
+                const content = dropdown.querySelector('.dropdown-content');
+                
+                button.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    
+                    // Close all other dropdowns immediately
+                    dropdowns.forEach(otherDropdown => {
+                        if (otherDropdown !== dropdown) {
+                            otherDropdown.querySelector('.dropbtn').classList.remove('active');
+                            otherDropdown.querySelector('.dropdown-content').classList.remove('show');
+                        }
+                    });
+                    
+                    // Toggle current dropdown
+                    button.classList.toggle('active');
+                    content.classList.toggle('show');
+                });
+            });
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(e) {
+                dropdowns.forEach(dropdown => {
+                    if (!dropdown.contains(e.target)) {
+                        const button = dropdown.querySelector('.dropbtn');
+                        const content = dropdown.querySelector('.dropdown-content');
+                        
+                        if (content.classList.contains('show')) {
+                            button.classList.remove('active');
+                            content.classList.remove('show');
+                        }
+                    }
+                });
+            });
+        });
+
+
 
         // Add initial cards
         for (let i = 0; i < 24; i++) {
