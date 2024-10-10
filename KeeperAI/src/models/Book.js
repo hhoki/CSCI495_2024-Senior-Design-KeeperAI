@@ -1,5 +1,6 @@
 const db = require("../config/db");
 const path = require('path');
+
 //Google Gemini Configurations and Libraries
 const {
   GoogleGenerativeAI,
@@ -63,6 +64,16 @@ class Book {
   static async findById(id) {
     try {
       const sql = "SELECT * FROM books WHERE id = ?";
+      const [rows] = await db.execute(sql, [id]);
+      return rows[0];
+    } catch (error) {
+      throw new Error(`Error fetching book by id: ${error.message}`);
+    }
+  }
+
+  static async findAllBooksByShelfId(id) {
+    try {
+      const sql = "SELECT * FROM books WHERE shelfs_id = ?";
       const [rows] = await db.execute(sql, [id]);
       return rows[0];
     } catch (error) {

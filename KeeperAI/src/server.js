@@ -1,11 +1,24 @@
 
 require("dotenv").config(); // ALLOWS ENVIRONMENT VARIABLES TO BE SET ON PROCESS.ENV SHOULD BE AT TOP
-const express = require("express");
+
+const express = require('express');
+const path = require('path');
 const app = express();
+
 
 app.use(express.json());
 
-app.get('/', (req, res) => res.send('<h1>Hello Hoki</h1>'));
+
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Routes
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'index.html'));
+});
+
+app.get('/contact', (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'contact.html'));
+});
 
 
 app.use("/books", require("./routes/bookRoutes"));
