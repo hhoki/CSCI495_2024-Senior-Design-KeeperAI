@@ -21,9 +21,9 @@ const generationConfig = {
 };
 
 class Book {
-  constructor(books_id, shelfs_id, title, author, published_date, isbn, rating, description, cover, shelf_location) {
-    this.books_id = books_id;
-    this.shelfs_id = shelfs_id;
+  constructor(book_id, shelf_id, title, author, published_date, isbn, rating, description, cover, shelf_location) {
+    this.book_id = book_id;
+    this.shelf_id = shelf_id;
     this.title = title;
     this.author = author;
     this.published_date = published_date;
@@ -37,12 +37,12 @@ class Book {
   async save() {
     try {
       const sql = `
-        INSERT INTO books(
-          books_id, shelfs_id, title, author, published_date, isbn, rating, description, cover, shelf_location
+        INSERT INTO book(
+          book_id, shelf_id, title, author, published_date, isbn, rating, description, cover, shelf_location
         )
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `;
-      const values = [this.books_id, this.shelfs_id, this.title, this.author, this.published_date, this.isbn, this.rating, this.description, this.cover, this.shelf_location];
+      const values = [this.book_id, this.shelf_id, this.title, this.author, this.published_date, this.isbn, this.rating, this.description, this.cover, this.shelf_location];
 
       const [result] = await db.execute(sql, values);
       return result.insertId;
@@ -53,17 +53,17 @@ class Book {
 
   static async findAll() {
     try {
-      const sql = "SELECT * FROM books";
+      const sql = "SELECT * FROM book";
       const [rows] = await db.execute(sql);
       return rows;
     } catch (error) {
-      throw new Error(`Error fetching all books: ${error.message}`);
+      throw new Error(`Error fetching all book: ${error.message}`);
     }
   }
 
   static async findById(id) {
     try {
-      const sql = "SELECT * FROM books WHERE id = ?";
+      const sql = "SELECT * FROM book WHERE id = ?";
       const [rows] = await db.execute(sql, [id]);
       return rows[0];
     } catch (error) {
@@ -71,9 +71,9 @@ class Book {
     }
   }
 
-  static async findAllBooksByShelfId(id) {
+  static async findAllBookByShelfId(id) {
     try {
-      const sql = "SELECT * FROM books WHERE shelfs_id = ?";
+      const sql = "SELECT * FROM book WHERE shelf_id = ?";
       const [rows] = await db.execute(sql, [id]);
       return rows[0];
     } catch (error) {
@@ -84,9 +84,9 @@ class Book {
   async update() {
     try {
       const sql = `
-        UPDATE books
-        SET books_id = ?,
-            shelfs_id = ?,
+        UPDATE book
+        SET book_id = ?,
+            shelf_id = ?,
             title = ?,
             author = ?,
             published_date = ?,
@@ -96,7 +96,7 @@ class Book {
             shelf_location,
         WHERE id = ?
       `;
-      const values = [this.books_id, this.shelfs_id, this.title, this.author, this.published_date, this.isbn, this.rating, this.description, this.cover, this.shelf_location];
+      const values = [this.book_id, this.shelf_id, this.title, this.author, this.published_date, this.isbn, this.rating, this.description, this.cover, this.shelf_location];
 
       await db.execute(sql, values);
     } catch (error) {
@@ -105,11 +105,11 @@ class Book {
   }
 
   static async deleteById(id) {
-    const tableName = 'books';
+    const tableName = 'book';
     const detectionTableName = 'book_detections';
     try {
       // Delete the row
-      const deleteQuery = `DELETE FROM ${tableName} JOIN ${detectionTableName} on ${tableName}.books_id = ${detectionTableName}.book_id WHERE id = ?`;
+      const deleteQuery = `DELETE FROM ${tableName} JOIN ${detectionTableName} on ${tableName}.book_id = ${detectionTableName}.book_id WHERE id = ?`;
       await db.execute(deleteQuery, [id]);
       // Re-index the table
       await this.reindexTable();
@@ -121,13 +121,13 @@ class Book {
   }
 
   static async reindexTable() {
-    const tableName = 'books';
+    const tableName = 'book';
     try {
-      // Get all rows from the table sorted by ID
+      //Get all rows from the table sorted by ID
       const query = `SELECT * FROM ${tableName} ORDER BY id`;
       const [rows] = await db.execute(query);
 
-      // Update IDs sequentially starting from 1
+      //Update IDs sequentially starting from 1
       let index = 1;
       for (const row of rows) {
         const updateQuery = `UPDATE ${tableName} SET id = ? WHERE id = ?`;
@@ -143,23 +143,23 @@ class Book {
 
 
   static async uploadToGemini(path, mimeType) {
-    const uploadResult = await fileManager.uploadFile(path, {
-      mimeType,
-      displayName: path,
-    });
-    const file = uploadResult.file;
-    console.log(`Uploaded file ${file.displayName} as: ${file.name}`);
-    return file;
+    const fs = require('fs').promises;
+    const imageData = await fs.readFile(path);
+    return {
+      inlineData: {
+        data: imageData.toString('base64'),
+        mimeType: mimeType
+      }
+    };
   }
 
   static async generateContent(file) {
-    const model = genAI.getGenerativeModel({
-      model: 'gemini-1.5-flash',
-  });
-    const chatSession = model.startChat({
-      generationConfig});
-    const result = await chatSession.sendMessage("Tell me the titles of these books. Don't record authors");
-    return result.response.text();
+    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const prompt = "Analyze this image and tell me the titles of the books you see. List only the titles, not the authors.";
+    
+    const result = await model.generateContent([prompt, file]);
+    const response = await result.response;
+    return response.text();
   }
 }
 

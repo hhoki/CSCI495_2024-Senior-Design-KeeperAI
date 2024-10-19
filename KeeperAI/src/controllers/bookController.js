@@ -1,31 +1,48 @@
-const axios = require('axios');
-const Book = require('../models/Book');
+const multer = require('multer');
 const path = require('path');
+const Book = require('../models/Book');
+const fs = require('fs').promises;
 
+exports.detectBooks = async (req, res) => {
+  console.log('Detect Books function called');
+  if (!req.file) {
+    console.log('No file uploaded');
+    return res.status(400).json({ message: 'No file uploaded.' });
+  }
 
-exports.detectBook = async (req, res) => {
+  const filePath = req.file.path;
+  const mimeType = req.file.mimetype;
+
   try {
-    //TODO: Generalize for user. Static working solution for image already in file system. 
-    //TODO: Use multer for image storage
-    const mediaPath = path.join('../public/uploads');
-    const filePath = path.join(mediaPath, "book2.jpg");
-    const files = [
-      await Book.uploadToGemini(filePath, "image/jpeg"),
-    ];
+    console.log('File path:', filePath);
+    console.log('MIME type:', mimeType);
 
-    const resultText = await Book.generateContent(files);
+    //Prepare the file for Gemini
+    const fileData = await Book.uploadToGemini(filePath, mimeType);
+    console.log('File prepared for Gemini');
+
+    //Generate content using Gemini
+    const resultText = await Book.generateContent(fileData);
+    console.log('Gemini result:', resultText);
+
     res.json({ result: resultText });
   } catch (error) {
     console.error('Error during book detection:', error);
-    res.status(500).json({ message: 'Failed to detect books from the image.' });
+    res.status(500).json({ message: 'Failed to detect books from the image.', error: error.toString() });
+  } finally {
+    //Clean up the uploaded file
+    const fs = require('fs').promises;
+    await fs.unlink(filePath).catch(console.error);
   }
 };
 
 
+
+
 exports.getAllBooks = async (req, res, next) => {
   try {
-    const books = await Book.findAll();
-    res.status(200).json({ count: books.length, books });
+    const book = await Book.findAll();
+    res.status(200).json({ count: book.length, book });
   } catch (error) {
     next(error);
   }
@@ -34,9 +51,9 @@ exports.getAllBooks = async (req, res, next) => {
   
   exports.createBook = async (req, res, next) => {
     try {
-        const {books_id, shelfs_id, title, author, published_date, isbn, rating, description, cover, shelf_location } = req.body;
-        const books = new Book (books_id, shelfs_id, title, author, published_date, isbn, rating, description, cover, shelf_location);
-        await books.save();
+        const {book_id, shelf_id, title, author, published_date, isbn, rating, description, cover, shelf_location } = req.body;
+        const book = new Book (book_id, shelf_id, title, author, published_date, isbn, rating, description, cover, shelf_location);
+        await book.save();
         res.status(201).json({ message: "Book created" });
     } catch (error) {
       next(error);
@@ -58,8 +75,8 @@ exports.getAllBooks = async (req, res, next) => {
 exports.updateBookById = async (req, res, next) => {
   try {
     const bookID = req.params.id;
-    const { books_id, shelfs_id, title, author, published_date, isbn, rating, description, cover, shelf_location } = req.body;
-    const book = new Book(books_id, shelfs_id, title, author, published_date, isbn, rating, description, cover, shelf_location);
+    const { book_id, shelf_id, title, author, published_date, isbn, rating, description, cover, shelf_location } = req.body;
+    const book = new Book(book_id, shelf_id, title, author, published_date, isbn, rating, description, cover, shelf_location);
     book.id = bookID;
     await book.update();
     res.status(200).json({ message: "Book updated" });

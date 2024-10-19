@@ -3,25 +3,28 @@ require("dotenv").config(); // ALLOWS ENVIRONMENT VARIABLES TO BE SET ON PROCESS
 
 const express = require('express');
 const path = require('path');
+const cors = require('cors');
 const app = express();
 
+app.use(cors({
+  origin: 'http://localhost:3000',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+})
 
 app.use(express.json());
 
 
 app.use(express.static(path.join(__dirname, 'public')));
 
+app.use(express.static(path.join(__dirname, 'client/build')));
+
 // Routes
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'views', 'index.html'));
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'client/build', 'index.html'));
 });
 
-app.get('/contact', (req, res) => {
-    res.sendFile(path.join(__dirname, 'views', 'contact.html'));
-});
-
-
-app.use("/books", require("./routes/bookRoutes"));
+app.use("/book", require("./routes/bookRoutes"));
 app.use("/ai_performance", require("./routes/performanceRoutes"));
 app.use("/model_configurations", require("./routes/aiConfigRoutes"));
 app.use("/detections", require("./routes/detectionRoutes"));
@@ -38,5 +41,5 @@ app.use((err, req, res, next) => {
   });
 
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server running on PORT ${PORT}`));
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

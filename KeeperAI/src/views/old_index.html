@@ -61,15 +61,11 @@
 
             <div class="layout-container">
                 <div class="side-navbar" id="myNavbar">
-                    <button onclick="removeButton(this)">1</button>
-                    <button onclick="removeButton(this)">2</button>
-                    <button onclick="removeButton(this)">3</button>
-                    <button id="addButton" onclick="addButton()">+ </button>
                 </div>
                 <div class="content">
                     <nav class="topnav">
                         <div class="topnav-section topnav-left">
-                            <button class="addbtn" onclick="showAddBooksModal()">+</button>
+                            <button class="addbtn" onclick="showAddBookModal()">+</button>
                         </div>
                         <div class="topnav-section topnav-center">
                             <h1>Shelf Name</h3>
@@ -94,14 +90,37 @@
                     </div>
                 </div>
             
-                <div id="addBooksModal" class="add-books-modal">
-                    <div class="add-books-modal-content">
-                        <span class="close" id="closeAddBooksModal">&times;</span>
-                        <h2 id="addBooksModalTitle"></h2>
-                        <div id="addBooksModalContent"></div>
+                <div id="addBookModal" class="add-book-modal">
+                    <div class="add-book-modal-content">
+                        <span class="close" id="closeAddBookModal">&times;</span>
+                        <h2 id="addBookModalTitle"></h2>
+                        <div id="addBookModalContent"></div>
                     </div>
                 </div>
+
+                <div id="addShelfModal" class="modal">
+                    <div class="add-shelf-modal-content">
+                        <span class="close" id="closeAddShelfModal">&times;</span>
+                        <h2 id="addShelfModalTitle"></h2>
+                        <div id="addShelfModalContent"></div>
+                    </div>
+                </div>
+
+                <div id="addShelfModal" class="modal">
+                    <div class="modal-content">
+                      <span class="close" onclick="closeAddShelfModal()">&times;</span>
+                      <h2>Add New Shelf</h2>
+                      <form id="addShelfForm">
+                        <label for="shelfName">Shelf Name:</label>
+                        <input type="text" id="shelfName" required>
+                        <label for="shelfDescription">Description:</label>
+                        <textarea id="shelfDescription"></textarea>
+                        <button type="submit">Add Shelf</button>
+                      </form>
+                    </div>
+                  </div>
             </div>
+            
             
 
 

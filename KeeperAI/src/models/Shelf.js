@@ -10,7 +10,7 @@ class Shelf {
   async save() {
     try {
       const sql = `
-        INSERT INTO shelfs(
+        INSERT INTO shelf(
           shelf_id, shelf_name, shelf_description
         )
         VALUES (?, ?, ?)
@@ -20,34 +20,34 @@ class Shelf {
       const [result] = await db.execute(sql, values);
       return result.insertId;
     } catch (error) {
-      throw new Error(`Error saving shelfs: ${error.message}`);
+      throw new Error(`Error saving shelf: ${error.message}`);
     }
   }
 
   static async findAll() {
     try {
-      const sql = "SELECT * FROM shelfs";
+      const sql = "SELECT * FROM shelf";
       const [rows] = await db.execute(sql);
       return rows;
     } catch (error) {
-      throw new Error(`Error fetching all shelfs: ${error.message}`);
+      throw new Error(`Error fetching all shelf: ${error.message}`);
     }
   }
 
   static async findById(id) {
     try {
-      const sql = "SELECT * FROM shelfs WHERE id = ?";
+      const sql = "SELECT * FROM shelf WHERE id = ?";
       const [rows] = await db.execute(sql, [id]);
       return rows[0];
     } catch (error) {
-      throw new Error(`Error fetching shelfs by id: ${error.message}`);
+      throw new Error(`Error fetching shelf by id: ${error.message}`);
     }
   }
 
   async update() {
     try {
       const sql = `
-        UPDATE shelfs
+        UPDATE shelf
         SET shelf_id = ?,
             shelf_name = ?,
             shelf_description,
@@ -57,13 +57,13 @@ class Shelf {
       
       await db.execute(sql, values);
     } catch (error) {
-      throw new Error(`Error updating shelfs: ${error.message}`);
+      throw new Error(`Error updating shelf: ${error.message}`);
     }
   }
 
   static async deleteById(id) {
-    const tableName = 'shelfs';
-    const bookTableName = 'books';
+    const tableName = 'shelf';
+    const bookTableName = 'book';
     try {
       // Delete the row
       const deleteQuery = `DELETE FROM ${tableName} WHERE id = ?`;
@@ -83,7 +83,7 @@ class Shelf {
   }
 
   static async reindexTable() {
-    const tableName = 'shelfs'; 
+    const tableName = 'shelf'; 
     try {
       // Get all rows from the table sorted by ID
       const query = `SELECT * FROM ${tableName} ORDER BY id`;

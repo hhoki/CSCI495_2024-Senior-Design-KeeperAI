@@ -1,0 +1,37 @@
+.shelf-navbar {
+  background-color: #efefef;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.shelf-nav-left, .shelf-nav-right {
+  display: flex;
+  align-items: center;
+}
+
+.shelf-name {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #333;
+}
+
+.add-button {
+  margin-right: 15px;
+  padding: 5px 10px;
+  font-size: 20px;
+  background-color: #6d6d6d;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.settings-icon {
+  width: 25px;
+  height: 25px;
+  cursor: pointer;
+}

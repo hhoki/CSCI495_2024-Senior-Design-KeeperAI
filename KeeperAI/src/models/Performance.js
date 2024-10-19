@@ -50,7 +50,7 @@ class Performance {
   async update() {
     try {
         const sql = `
-        UPDATE books
+        UPDATE book
         SET performance_id = ?,
             model_used = ?,
             detection_count = ?,

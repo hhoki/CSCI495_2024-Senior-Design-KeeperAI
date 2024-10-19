@@ -2,16 +2,11 @@ const express = require("express");
 const shelfController = require("../controllers/shelfController");
 const router = express.Router();
 
-//TODO: potential syntax arrors with database. May need to rename
-
 router
   .route("/")
-  .get(shelfController.getAllShelfs)
-  .post(shelfController.createShelf)
- // .post('/upload', upload.single('shelf'), shelfController.detectShelf);
+  .get(shelfController.getAllShelves)
+  .post(shelfController.createShelf);
 
-
-  
 router
   .route("/:id")
   .get(shelfController.getShelfById)

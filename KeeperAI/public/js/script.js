@@ -1,15 +1,15 @@
         const cardModal = document.getElementById('cardModal');
-        const addBooksModal = document.getElementById('addBooksModal');
+        const addBookModal = document.getElementById('addBookModal');
 
         // Separate modal elements for each modal
         const cardModalTitle = document.getElementById('cardModalTitle');
         const cardModalContent = document.getElementById('cardModalContent');
-        const addBooksModalTitle = document.getElementById('addBooksModalTitle');
-        const addBooksModalContent = document.getElementById('addBooksModalContent');
+        const addBookModalTitle = document.getElementById('addBookModalTitle');
+        const addBookModalContent = document.getElementById('addBookModalContent');
         
         // Separate close buttons for each modal
         const closeCardBtn = document.getElementById('closeCardModal');
-        const closeAddBooksBtn = document.getElementById('closeAddBooksModal');
+        const closeAddBookBtn = document.getElementById('closeAddBookModal');
 
 
         function addCard() {
@@ -143,11 +143,11 @@
             cardModal.classList.add('show');
         }
 
-        function showAddBooksModal() {
-            addBooksModalTitle.textContent = 'Upload Photo of Books to Add';
+        function showAddBookModal() {
+            addBookModalTitle.textContent = 'Upload Photo of Book to Add';
             // Still need to do more here.
-            addBooksModalContent.innerHTML = `
-                <p>Here you can add new books to your collection.</p>
+            addBookModalContent.innerHTML = `
+                <p>Here you can add new book to your collection.</p>
                 <form action="/action_page.php">
                     <label for="img">Select image:</label>
                     <input type="file" id="img" name="img" accept="image/*">
@@ -168,10 +168,10 @@
                     </select>
                 </form>
             `;
-            addBooksModal.style.display = 'block';
+            addBookModal.style.display = 'block';
             // Trigger reflow to ensure animation plays
-            void addBooksModal.offsetWidth;
-            addBooksModal.classList.add('show');
+            void addBookModal.offsetWidth;
+            addBookModal.classList.add('show');
         }
         
         function closeModal(modal) {
@@ -183,7 +183,7 @@
 
         // Modal close functionality
         closeCardBtn.onclick = () => closeModal(cardModal);
-        closeAddBooksBtn.onclick = () => closeModal(addBooksModal);
+        closeAddBookBtn.onclick = () => closeModal(addBookModal);
 
 
         // Close modals when clicking outside
@@ -191,8 +191,8 @@
             if (event.target == cardModal) {
                 cardModal.style.display = 'none';
             }
-            if (event.target == addBooksModal) {
-                addBooksModal.style.display = 'none';
+            if (event.target == addBookModal) {
+                addBookModal.style.display = 'none';
             }
         }
 

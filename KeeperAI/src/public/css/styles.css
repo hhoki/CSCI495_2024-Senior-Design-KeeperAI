@@ -405,36 +405,41 @@ header {
 }
 
 /* Common modal styles */
-.modal, .add-books-modal {
+.modal, .add-book-modal {
   display: none;
   position: fixed;
   z-index: 1001;
   left: 0;
   top: 0;
   width: 100%;
-  height: 120%;
-  background-color: rgba(0, 0, 0, 0);
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0,0,0,0.4);
   transition: background-color 0.3s ease;
   opacity: 0;
 }
 
-.modal.show, .add-books-modal.show {
+.modal.show, .add-book-modal.show {
   opacity: 1;
   background-color: rgba(0, 0, 0, 0.5);
 }
 
-.modal-content, .add-books-modal-content {
+.modal-content, .add-book-modal-content {
   background-color: #fefefe;
+  margin: 15% auto;
   padding: 20px;
-  border-radius: 8px;
+  border: 1px solid #888;
+  width: 80%;
+  max-width: 500px;
   position: relative;
-  opacity: 0;
+  z-index: 1002;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
   transform: scale(0.7);
   transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 }
 
 .modal.show .modal-content,
-.add-books-modal.show .add-books-modal-content {
+.add-book-modal.show .add-book-modal-content {
   opacity: 1;
   transform: scale(1);
 }
@@ -448,7 +453,7 @@ header {
   max-height: 1200px;
 }
 
-.add-books-modal-content {
+.add-book-modal-content {
   margin: 15% auto;
   width: 90%;
   height: 120%;
@@ -500,5 +505,46 @@ header {
   }
 }
 
+#addShelfModal {
+  display: none;
+  position: fixed;
+  z-index: 1001;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0,0,0,0.4);
+}
 
+#addShelfModal .modal-content {
+  background-color: #fefefe;
+  margin: 15% auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%;
+  max-width: 500px;
+}
+
+#addShelfModal form {
+  display: flex;
+  flex-direction: column;
+}
+
+#addShelfModal input, #addShelfModal textarea {
+  margin-bottom: 10px;
+  padding: 5px;
+}
+
+#addShelfModal button {
+  background-color: #4CAF50;
+  color: white;
+  padding: 10px;
+  border: none;
+  cursor: pointer;
+}
+
+#addShelfModal button:hover {
+  background-color: #45a049;
+}
 
