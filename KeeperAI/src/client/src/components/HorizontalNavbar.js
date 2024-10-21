@@ -7,11 +7,11 @@ const HorizontalNavbar = ({ onAddBook }) => {
   return (
     <nav className="navbar">
       <div className="nav-left">
-        <img src="/images/KeeperAI [Transparent].png" alt="Logo" className="logo" />
+        <img src="/images/K [KeeperAI].png" alt="Logo" className="logo" />
       </div>
       <div className="nav-center">
         <div className="search-bar">
-          <img src="/images/icons/search.png" alt="Search" className="search-icon" />
+          <img src="/images/icons/search.png" alt="Search" className="search-icon"  />
           <input type="text" placeholder="Search..." className="search-input" />
         </div>
       </div>

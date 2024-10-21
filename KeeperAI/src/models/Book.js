@@ -71,13 +71,14 @@ class Book {
     }
   }
 
-  static async findAllBookByShelfId(id) {
+  static async findByShelfId(shelfId) {
     try {
       const sql = "SELECT * FROM book WHERE shelf_id = ?";
-      const [rows] = await db.execute(sql, [id]);
-      return rows[0];
+      const [rows] = await db.execute(sql, [shelfId]);
+      return rows;
     } catch (error) {
-      throw new Error(`Error fetching book by id: ${error.message}`);
+      console.error('Error fetching books by shelf ID:', error);
+      throw new Error(`Error fetching books by shelf ID: ${error.message}`);
     }
   }
 
@@ -117,6 +118,19 @@ class Book {
       console.log(`Deleted row with ID ${id} from ${tableName} table`);
     } catch (error) {
       console.error(`Error deleting row with ID ${id} from ${tableName} table:`, error);
+    }
+  }
+
+  static async deleteByShelfId(shelfId) {
+    try {
+      console.log(`Deleting books for shelf ID: ${shelfId}`);
+      const sql = "DELETE FROM book WHERE shelf_id = ?";
+      const [result] = await db.execute(sql, [shelfId]);
+      console.log(`Deleted ${result.affectedRows} books for shelf ID ${shelfId}`);
+      return result.affectedRows;
+    } catch (error) {
+      console.error('Error deleting books by shelf ID:', error);
+      throw new Error(`Error deleting books by shelf ID: ${error.message}`);
     }
   }
 

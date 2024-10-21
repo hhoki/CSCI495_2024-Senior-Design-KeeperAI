@@ -29,4 +29,7 @@ router
   .patch(bookController.updateBookById)
   .delete(bookController.deleteBookById);
 
+router
+  .get("/shelf/:shelfId", bookController.getBooksByShelfId);
+
 module.exports = router;

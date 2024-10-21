@@ -81,7 +81,7 @@ DROP TABLE IF EXISTS `book`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `book` (
-  `book_id` int NOT NULL,
+  `book_id` int NOT NULL AUTO_INCREMENT,
   `shelf_id` int NOT NULL,
   `title` varchar(225) DEFAULT NULL,
   `author` varchar(225) DEFAULT NULL,

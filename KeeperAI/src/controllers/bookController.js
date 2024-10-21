@@ -94,3 +94,14 @@ exports.deleteBookById = async (req, res, next) => {
     next(error);
   }
 };
+
+exports.getBooksByShelfId = async (req, res, next) => {
+  try {
+    const { shelfId } = req.params;
+    const books = await Book.findByShelfId(shelfId);
+    res.status(200).json({ books });
+  } catch (error) {
+    console.error('Error fetching books for shelf:', error);
+    next(error);
+  }
+};

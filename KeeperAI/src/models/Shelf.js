@@ -9,28 +9,34 @@ class Shelf {
 
   async save() {
     try {
+      console.log('Saving shelf:', this);
       const sql = `
-        INSERT INTO shelf(
-          shelf_id, shelf_name, shelf_description
-        )
-        VALUES (?, ?, ?)
+        INSERT INTO shelf (shelf_name, shelf_description)
+        VALUES (?, ?)
       `;
-      const values = [this.shelf_id, this.shelf_name, this.shelf_description];
+      const values = [this.shelf_name, this.shelf_description];
       
       const [result] = await db.execute(sql, values);
+      console.log('Save result:', result);
+      
       return result.insertId;
     } catch (error) {
+      console.error('Error saving shelf:', error);
       throw new Error(`Error saving shelf: ${error.message}`);
     }
   }
 
   static async findAll() {
     try {
+      console.log('Executing findAll method');
       const sql = "SELECT * FROM shelf";
+      console.log('SQL query:', sql);
       const [rows] = await db.execute(sql);
-      return rows;
+      console.log('Rows retrieved from database:', rows);
+      return rows.map(row => new Shelf(row.shelf_id, row.shelf_name, row.shelf_description));
     } catch (error) {
-      throw new Error(`Error fetching all shelf: ${error.message}`);
+      console.error('Error in Shelf.findAll:', error);
+      throw new Error(`Failed to fetch shelves: ${error.message}`);
     }
   }
 
@@ -62,23 +68,21 @@ class Shelf {
   }
 
   static async deleteById(id) {
-    const tableName = 'shelf';
-    const bookTableName = 'book';
     try {
-      // Delete the row
-      const deleteQuery = `DELETE FROM ${tableName} WHERE id = ?`;
-      const deleteBookQuery = `DELETE FROM ${bookTableName} WHERE book_detections = ?`;
+      console.log('Deleting shelf with ID:', id);
+      const sql = "DELETE FROM shelf WHERE shelf_id = ?";
+      const [result] = await db.execute(sql, [id]);
       
+      console.log('Delete operation result:', result);
       
-      await db.execute(deleteBookQuery, [id]);
-      await db.execute(deleteQuery, [id]);
-
-      // Re-index the table
-      await this.reindexTable();
-
-      console.log(`Deleted row with ID ${id} from ${tableName} table`);
+      if (result.affectedRows === 0) {
+        throw new Error('No shelf found with the given ID');
+      }
+      
+      return true;
     } catch (error) {
-      console.error(`Error deleting row with ID ${id} from ${tableName} table:`, error);
+      console.error('Error deleting shelf:', error);
+      throw new Error(`Failed to delete shelf: ${error.message}`);
     }
   }
 

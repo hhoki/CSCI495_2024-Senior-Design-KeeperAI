@@ -1,33 +1,37 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../styles/VerticalNavbar.css';
 
 const VerticalNavbar = ({ shelves, selectedShelf, onShelfSelect, onAddShelfClick }) => {
   const [expandedShelf, setExpandedShelf] = useState(null);
 
-  const toggleShelf = (shelfId) => {
-    if (expandedShelf === shelfId) {
-      setExpandedShelf(null);
-    } else {
-      setExpandedShelf(shelfId);
+  useEffect(() => {
+    console.log('VerticalNavbar - Selected shelf changed:', selectedShelf);
+    if (selectedShelf) {
+      setExpandedShelf(selectedShelf.id || selectedShelf.shelf_id);
+      console.log('Expanding shelf:', selectedShelf.id || selectedShelf.shelf_id);
     }
+  }, [selectedShelf]);
+
+  const handleShelfClick = (shelf) => {
+    console.log('Shelf clicked:', shelf);
+    onShelfSelect(shelf.id || shelf.shelf_id);
   };
+
+  console.log('VerticalNavbar - Rendering with shelves:', shelves);
 
   return (
     <nav className="side-navbar">
       <div className="shelf-buttons-container">
         {shelves.map((shelf) => (
-          <div key={shelf.id} className="shelf-item">
+          <div key={shelf.id || shelf.shelf_id} className="shelf-item">
             <button
-              className={`shelf-button ${selectedShelf && selectedShelf.id === shelf.id ? 'selected' : ''}`}
-              onClick={() => {
-                onShelfSelect(shelf.id);
-                toggleShelf(shelf.id);
-              }}
+              className={`shelf-button ${selectedShelf && (selectedShelf.id === shelf.id || selectedShelf.shelf_id === shelf.shelf_id) ? 'selected' : ''}`}
+              onClick={() => handleShelfClick(shelf)}
             >
               {shelf.name}
             </button>
-            <div className={`shelf-description ${expandedShelf === shelf.id ? 'expanded' : ''}`}>
-              {shelf.description}
+            <div className={`shelf-description ${expandedShelf === (shelf.id || shelf.shelf_id) ? 'expanded' : ''}`}>
+              {shelf.description || 'No description'}
             </div>
           </div>
         ))}

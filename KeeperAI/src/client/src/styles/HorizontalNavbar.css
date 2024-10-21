@@ -34,14 +34,15 @@
 .logo {
   width: 54px;
   height: 54px;
-  padding: 4px;
-  border-radius: 25px;
-  transition: background-color 0.3s ease;
+  padding: 6px;
+  border-radius: 30px;
+  transition: all 0.3s ease; /* Smooth transition for button background */
+  
 }
 
 .logo:hover {
   background-color: #b0afaf;
-  border-radius: 25px;
+  border-radius: 30px;
 }
 
 .search-bar {
@@ -68,14 +69,15 @@
 
 .profile-icon {
   width: 54px;
-  height: 54px;
+  height: auto;
   padding: 12px;
   border-radius: 25px;
+  object-fit: fill;
   transition: background-color 0.3s ease;
 }
 
 .profile-icon:hover {
-  border-radius: 25px;
+  border-radius: 30px;
   background-color: #b0afaf;
 }
 
@@ -85,7 +87,7 @@
   margin: 5px;
   padding: 12px 0px 0px 0px;
   text-align: center;
-  border-radius: 25px;
+  border-radius: 30px;
   transition: all 0.3s ease; /* Smooth transition for button background */
 }
 

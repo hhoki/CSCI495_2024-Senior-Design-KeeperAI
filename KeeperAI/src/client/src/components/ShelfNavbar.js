@@ -1,12 +1,23 @@
 import React, { useState } from 'react';
 import AddBooksModal from './AddBooksModal';
+import DeleteConfirmationModal from './DeleteConfirmationModal';
 import '../styles/ShelfNavbar.css';
 
-const ShelfNavbar = ({ shelfName, onAddBook, onShelfSettings }) => {
+const ShelfNavbar = ({ shelfName, onAddBook, onShelfSettings, onDeleteShelf }) => {
   const [isAddBooksModalOpen, setIsAddBooksModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const handleAddBook = () => {
     setIsAddBooksModalOpen(true);
+  };
+
+  const handleDeleteClick = () => {
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleConfirmDelete = () => {
+    onDeleteShelf();
+    setIsDeleteModalOpen(false);
   };
 
   return (
@@ -22,10 +33,19 @@ const ShelfNavbar = ({ shelfName, onAddBook, onShelfSettings }) => {
           className="settings-icon" 
           onClick={onShelfSettings}
         />
+        <button onClick={handleDeleteClick} className="delete-shelf-button">
+          <img src="/images/icons/trash.png" alt="Delete" className="delete-icon" />
+        </button>
       </div>
       {isAddBooksModalOpen && (
         <AddBooksModal onClose={() => setIsAddBooksModalOpen(false)} />
       )}
+      <DeleteConfirmationModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={handleConfirmDelete}
+        itemName={shelfName}
+      />
     </nav>
   );
 };
