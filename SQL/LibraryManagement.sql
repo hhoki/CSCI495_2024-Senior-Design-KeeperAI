@@ -89,11 +89,11 @@ CREATE TABLE `book` (
   `isbn` varchar(20) DEFAULT NULL,
   `rating` varchar(45) DEFAULT NULL,
   `description` TEXT DEFAULT NULL,
+  'user_notes' TEXT DEFAULT NULL,
   `cover` varchar(255) DEFAULT NULL,
   `shelf_location` varchar(45) DEFAULT NULL,
   `date_added` datetime DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`book_id`),
-  UNIQUE KEY `Bookcol_UNIQUE` (`shelf_location`) /*!80000 INVISIBLE */,
   KEY `shelf_id` (`shelf_id`),
   CONSTRAINT `shelf_id` FOREIGN KEY (`shelf_id`) REFERENCES `shelf` (`shelf_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;

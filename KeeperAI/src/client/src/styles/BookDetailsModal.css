@@ -1,4 +1,4 @@
-.book-modal-backdrop {
+.book-details-modal-backdrop {
     position: fixed;
     top: 0;
     left: 0;
@@ -11,84 +11,170 @@
     z-index: 1000;
   }
   
-  .book-modal-content {
+  .book-details-modal-content {
     background-color: white;
-    padding: 40px;
-    border-radius: 12px;
-    width: 90%;
-    max-width: 1200px;
-    height: 90%;
-    max-height: 800px;
-    overflow-y: auto;
+    width: 75%;
+    max-width: 900px;
+    height: 80%;
+    border-radius: 8px;
     position: relative;
-    display: flex;
-    flex-direction: column;
+    overflow: auto;
+    padding: 20px;
   }
   
-  .book-modal-close-button {
+  .book-details-close-button {
     position: absolute;
-    top: 20px;
-    right: 20px;
-    font-size: 32px;
+    top: 10px;
+    right: 10px;
     background: none;
     border: none;
+    font-size: 24px;
     cursor: pointer;
     color: #333;
   }
   
-  .book-modal-details {
+  .book-details-layout {
     display: flex;
-    gap: 40px;
-    margin-bottom: 30px;
+    gap: 30px;
+    margin-top: 20px;
   }
   
-  .book-modal-cover {
-    width: 300px;
+  .book-details-left {
+    flex: 0 0 300px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .book-details-cover {
+    width: 100%;
     height: auto;
-    object-fit: cover;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   }
   
-  .book-modal-info {
+  .book-details-rating-container {
+    margin-top: 15px;
+    text-align: center;
+  }
+  
+  .book-details-stars {
+    display: flex;
+    justify-content: center;
+    gap: 4px;
+  }
+  
+  .book-details-rating-text {
+    display: block;
+    margin-top: 5px;
+    color: #666;
+  }
+  
+  .book-details-right {
     flex: 1;
   }
   
-  .book-modal-info h2 {
-    font-size: 28px;
+  .book-details-title {
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #333;
+  }
+  
+  .book-details-info-section {
     margin-bottom: 20px;
   }
   
-  .book-modal-info p {
-    font-size: 18px;
+  .book-details-info-row {
     margin-bottom: 10px;
   }
   
-  .book-modal-description {
-    margin-top: 30px;
+  .book-details-info-label {
+    font-weight: 600;
+    color: #666;
+    margin-right: 8px;
   }
   
-  .book-modal-description h3 {
-    font-size: 24px;
-    margin-bottom: 15px;
+  .book-details-info-value {
+    color: #333;
   }
   
-  .book-modal-description p {
-    font-size: 16px;
-    line-height: 1.6;
+  .book-details-description-section {
+    margin-bottom: 20px;
+  }
+  
+  .book-details-description-heading {
+    font-size: 18px;
+    margin-bottom: 10px;
+    color: #333;
+  }
+  
+  .book-details-notes-section {
+    border-top: 1px solid #eee;
+    padding-top: 20px;
+  }
+  
+  .book-details-notes-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  
+  .book-details-edit-button {
+    padding: 5px 15px;
+    background-color: #f0f0f0;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .book-details-notes-edit {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .book-details-notes-textarea {
+    width: 100%;
+    min-height: 100px;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    resize: vertical;
+  }
+  
+  .book-details-notes-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+  }
+  
+  .book-details-save-button,
+  .book-details-cancel-button {
+    padding: 5px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .book-details-save-button {
+    background-color: #4CAF50;
+    color: white;
+  }
+  
+  .book-details-cancel-button {
+    background-color: #f44336;
+    color: white;
   }
   
   @media (max-width: 768px) {
-    .book-modal-content {
-      padding: 20px;
-    }
-  
-    .book-modal-details {
+    .book-details-layout {
       flex-direction: column;
     }
   
-    .book-modal-cover {
-      width: 100%;
-      max-width: 300px;
-      margin: 0 auto 20px;
+    .book-details-left {
+      flex: none;
+      max-width: 250px;
+      margin: 0 auto;
     }
   }

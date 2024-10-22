@@ -54,12 +54,11 @@ class Shelf {
     try {
       const sql = `
         UPDATE shelf
-        SET shelf_id = ?,
-            shelf_name = ?,
-            shelf_description,
-        WHERE id = ?
+        SET shelf_name = ?,
+            shelf_description = ?
+        WHERE shelf_id = ?
       `;
-      const values = [this.shelf_id, this.shelf_name, this.shelf_description];
+      const values = [this.shelf_name, this.shelf_description, this.shelf_id];
       
       await db.execute(sql, values);
     } catch (error) {
