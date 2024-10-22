@@ -1,0 +1,74 @@
+.shelf-navbar {
+  background-color: #efefef;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.shelf-nav-left, .shelf-nav-right {
+  display: flex;
+  align-items: center;
+}
+
+.shelf-name {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #333;
+}
+
+.add-button {
+  margin-right: 15px;
+  padding: 5px 10px;
+  font-size: 24px;
+  font-weight: bold;
+  color: rgb(0, 0, 0);
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.add-button:hover {
+  background-color: #b0afaf;
+  
+}
+
+.settings-icon {
+  width: 40px;
+  height: 40px;
+  padding: 8px;
+  border-radius: 25px;
+  cursor: pointer;
+}
+
+.settings-icon:hover {
+  background-color: #b0afaf;
+  border-radius: 24px;
+  transition: all 0.3s ease;
+}
+
+.delete-shelf-button {
+  width: 40px;
+  height: 40px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  margin-left: 10px;
+  border-radius: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.delete-shelf-button:hover {
+  background-color: #b0afaf;
+  border-radius: 24px;
+  transition: all 0.3s ease;
+}
+
+.delete-icon {
+  width: 20px;
+  height: 20px;
+}

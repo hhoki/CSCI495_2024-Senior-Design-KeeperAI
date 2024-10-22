@@ -1,9 +1,29 @@
 const db = require("../config/db");
+const path = require('path');
+
+//Google Gemini Configurations and Libraries
+const {
+  GoogleGenerativeAI,
+  HarmCategory,
+  HarmBlockThreshold,
+} = require("@google/generative-ai");
+const { GoogleAIFileManager } = require("@google/generative-ai/server");
+//Replace in .env with your api key
+const apiKey = process.env.API_KEY;
+const genAI = new GoogleGenerativeAI(apiKey);
+const fileManager = new GoogleAIFileManager(apiKey);
+const generationConfig = {
+  temperature: 1,
+  topP: 0.95,
+  topK: 64,
+  maxOutputTokens: 8192,
+  responseMimeType: "text/plain",
+};
 
 class Book {
-  constructor(books_id, shelfs_id, title, author, published_date, isbn, rating, description, cover, shelf_location ) {
-    this.books_id = books_id;
-    this.shelfs_id = shelfs_id;
+  constructor(book_id, shelf_id, title, author, published_date, isbn, rating, description, cover, shelf_location) {
+    this.book_id = book_id;
+    this.shelf_id = shelf_id;
     this.title = title;
     this.author = author;
     this.published_date = published_date;
@@ -17,13 +37,13 @@ class Book {
   async save() {
     try {
       const sql = `
-        INSERT INTO books(
-          books_id, shelfs_id, title, author, published_date, isbn, rating, description, cover, shelf_location
+        INSERT INTO book(
+          book_id, shelf_id, title, author, published_date, isbn, rating, description, cover, shelf_location
         )
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `;
-      const values = [this.books_id,this.shelfs_id, this.title, this.author, this.published_date, this.isbn, this.rating, this.description, this.cover, this.shelf_location];
-      
+      const values = [this.book_id, this.shelf_id, this.title, this.author, this.published_date, this.isbn, this.rating, this.description, this.cover, this.shelf_location];
+
       const [result] = await db.execute(sql, values);
       return result.insertId;
     } catch (error) {
@@ -33,17 +53,17 @@ class Book {
 
   static async findAll() {
     try {
-      const sql = "SELECT * FROM books";
+      const sql = "SELECT * FROM book";
       const [rows] = await db.execute(sql);
       return rows;
     } catch (error) {
-      throw new Error(`Error fetching all books: ${error.message}`);
+      throw new Error(`Error fetching all book: ${error.message}`);
     }
   }
 
   static async findById(id) {
     try {
-      const sql = "SELECT * FROM books WHERE id = ?";
+      const sql = "SELECT * FROM book WHERE id = ?";
       const [rows] = await db.execute(sql, [id]);
       return rows[0];
     } catch (error) {
@@ -51,12 +71,23 @@ class Book {
     }
   }
 
+  static async findByShelfId(shelfId) {
+    try {
+      const sql = "SELECT * FROM book WHERE shelf_id = ?";
+      const [rows] = await db.execute(sql, [shelfId]);
+      return rows;
+    } catch (error) {
+      console.error('Error fetching books by shelf ID:', error);
+      throw new Error(`Error fetching books by shelf ID: ${error.message}`);
+    }
+  }
+
   async update() {
     try {
       const sql = `
-        UPDATE books
-        SET books_id = ?,
-            shelfs_id = ?,
+        UPDATE book
+        SET book_id = ?,
+            shelf_id = ?,
             title = ?,
             author = ?,
             published_date = ?,
@@ -66,8 +97,8 @@ class Book {
             shelf_location,
         WHERE id = ?
       `;
-      const values = [this.books_id,this.shelfs_id, this.title, this.author, this.published_date, this.isbn, this.rating, this.description, this.cover, this.shelf_location];
-      
+      const values = [this.book_id, this.shelf_id, this.title, this.author, this.published_date, this.isbn, this.rating, this.description, this.cover, this.shelf_location];
+
       await db.execute(sql, values);
     } catch (error) {
       throw new Error(`Error updating book: ${error.message}`);
@@ -75,11 +106,11 @@ class Book {
   }
 
   static async deleteById(id) {
-    const tableName = 'books';
+    const tableName = 'book';
     const detectionTableName = 'book_detections';
     try {
       // Delete the row
-      const deleteQuery = `DELETE FROM ${tableName} JOIN ${detectionTableName} on ${tableName}.books_id = ${detectionTableName}.book_id WHERE id = ?`;      
+      const deleteQuery = `DELETE FROM ${tableName} JOIN ${detectionTableName} on ${tableName}.book_id = ${detectionTableName}.book_id WHERE id = ?`;
       await db.execute(deleteQuery, [id]);
       // Re-index the table
       await this.reindexTable();
@@ -90,14 +121,27 @@ class Book {
     }
   }
 
-  static async reindexTable() {
-    const tableName = 'books'; 
+  static async deleteByShelfId(shelfId) {
     try {
-      // Get all rows from the table sorted by ID
+      console.log(`Deleting books for shelf ID: ${shelfId}`);
+      const sql = "DELETE FROM book WHERE shelf_id = ?";
+      const [result] = await db.execute(sql, [shelfId]);
+      console.log(`Deleted ${result.affectedRows} books for shelf ID ${shelfId}`);
+      return result.affectedRows;
+    } catch (error) {
+      console.error('Error deleting books by shelf ID:', error);
+      throw new Error(`Error deleting books by shelf ID: ${error.message}`);
+    }
+  }
+
+  static async reindexTable() {
+    const tableName = 'book';
+    try {
+      //Get all rows from the table sorted by ID
       const query = `SELECT * FROM ${tableName} ORDER BY id`;
       const [rows] = await db.execute(query);
 
-      // Update IDs sequentially starting from 1
+      //Update IDs sequentially starting from 1
       let index = 1;
       for (const row of rows) {
         const updateQuery = `UPDATE ${tableName} SET id = ? WHERE id = ?`;
@@ -111,6 +155,26 @@ class Book {
     }
   }
 
+
+  static async uploadToGemini(path, mimeType) {
+    const fs = require('fs').promises;
+    const imageData = await fs.readFile(path);
+    return {
+      inlineData: {
+        data: imageData.toString('base64'),
+        mimeType: mimeType
+      }
+    };
+  }
+
+  static async generateContent(file) {
+    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const prompt = "Analyze this image and tell me the titles of the books you see. List only the titles, not the authors.";
+    
+    const result = await model.generateContent([prompt, file]);
+    const response = await result.response;
+    return response.text();
+  }
 }
 
 module.exports = Book;

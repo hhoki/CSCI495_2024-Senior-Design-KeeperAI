@@ -49,7 +49,7 @@ class Detection {
   async update() {
     try {
       const sql = `
-        UPDATE books
+        UPDATE book
         SET detection_id = ?,
             detection_time = ?,
             image_path = ?,
@@ -67,7 +67,7 @@ class Detection {
 
   static async deleteById(id) {
     const tableName = 'book_detections';
-    const bookTableName = 'books';
+    const bookTableName = 'book';
     try {
       // Delete the row
       const deleteQuery = `DELETE FROM ${tableName} WHERE id = ?`;

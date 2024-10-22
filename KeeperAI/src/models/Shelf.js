@@ -9,81 +9,84 @@ class Shelf {
 
   async save() {
     try {
+      console.log('Saving shelf:', this);
       const sql = `
-        INSERT INTO shelfs(
-          shelf_id, shelf_name, shelf_description
-        )
-        VALUES (?, ?, ?)
+        INSERT INTO shelf (shelf_name, shelf_description)
+        VALUES (?, ?)
       `;
-      const values = [this.shelf_id, this.shelf_name, this.shelf_description];
+      const values = [this.shelf_name, this.shelf_description];
       
       const [result] = await db.execute(sql, values);
+      console.log('Save result:', result);
+      
       return result.insertId;
     } catch (error) {
-      throw new Error(`Error saving shelfs: ${error.message}`);
+      console.error('Error saving shelf:', error);
+      throw new Error(`Error saving shelf: ${error.message}`);
     }
   }
 
   static async findAll() {
     try {
-      const sql = "SELECT * FROM shelfs";
+      console.log('Executing findAll method');
+      const sql = "SELECT * FROM shelf";
+      console.log('SQL query:', sql);
       const [rows] = await db.execute(sql);
-      return rows;
+      console.log('Rows retrieved from database:', rows);
+      return rows.map(row => new Shelf(row.shelf_id, row.shelf_name, row.shelf_description));
     } catch (error) {
-      throw new Error(`Error fetching all shelfs: ${error.message}`);
+      console.error('Error in Shelf.findAll:', error);
+      throw new Error(`Failed to fetch shelves: ${error.message}`);
     }
   }
 
   static async findById(id) {
     try {
-      const sql = "SELECT * FROM shelfs WHERE id = ?";
+      const sql = "SELECT * FROM shelf WHERE id = ?";
       const [rows] = await db.execute(sql, [id]);
       return rows[0];
     } catch (error) {
-      throw new Error(`Error fetching shelfs by id: ${error.message}`);
+      throw new Error(`Error fetching shelf by id: ${error.message}`);
     }
   }
 
   async update() {
     try {
       const sql = `
-        UPDATE shelfs
-        SET shelf_id = ?,
-            shelf_name = ?,
-            shelf_description,
-        WHERE id = ?
+        UPDATE shelf
+        SET shelf_name = ?,
+            shelf_description = ?
+        WHERE shelf_id = ?
       `;
-      const values = [this.shelf_id, this.shelf_name, this.shelf_description];
+      const values = [this.shelf_name, this.shelf_description, this.shelf_id];
       
       await db.execute(sql, values);
     } catch (error) {
-      throw new Error(`Error updating shelfs: ${error.message}`);
+      throw new Error(`Error updating shelf: ${error.message}`);
     }
   }
 
   static async deleteById(id) {
-    const tableName = 'shelfs';
-    const bookTableName = 'books';
     try {
-      // Delete the row
-      const deleteQuery = `DELETE FROM ${tableName} WHERE id = ?`;
-      const deleteBookQuery = `DELETE FROM ${bookTableName} WHERE book_detections = ?`;
+      console.log('Deleting shelf with ID:', id);
+      const sql = "DELETE FROM shelf WHERE shelf_id = ?";
+      const [result] = await db.execute(sql, [id]);
       
+      console.log('Delete operation result:', result);
       
-      await db.execute(deleteBookQuery, [id]);
-      await db.execute(deleteQuery, [id]);
-
-      // Re-index the table
-      await this.reindexTable();
-
-      console.log(`Deleted row with ID ${id} from ${tableName} table`);
+      if (result.affectedRows === 0) {
+        throw new Error('No shelf found with the given ID');
+      }
+      
+      return true;
     } catch (error) {
-      console.error(`Error deleting row with ID ${id} from ${tableName} table:`, error);
+      console.error('Error deleting shelf:', error);
+      throw new Error(`Failed to delete shelf: ${error.message}`);
     }
   }
 
   static async reindexTable() {
-    const tableName = 'shelfs'; 
+    const tableName = 'shelf'; 
     try {
       // Get all rows from the table sorted by ID
       const query = `SELECT * FROM ${tableName} ORDER BY id`;

@@ -60,7 +60,7 @@ CREATE TABLE `book_detections` (
   `book_id` int DEFAULT NULL,
   PRIMARY KEY (`detection_id`),
   KEY `book_id_idx` (`book_id`),
-  CONSTRAINT `book_id` FOREIGN KEY (`book_id`) REFERENCES `books` (`books_id`)
+  CONSTRAINT `book_id` FOREIGN KEY (`book_id`) REFERENCES `book` (`book_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -74,14 +74,14 @@ LOCK TABLES `book_detections` WRITE;
 UNLOCK TABLES;
 
 --
--- Table structure for table `books`
+-- Table structure for table `book`
 --
 
-DROP TABLE IF EXISTS `books`;
+DROP TABLE IF EXISTS `book`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `books` (
-  `books_id` int NOT NULL,
+CREATE TABLE `book` (
+  `book_id` int NOT NULL,
   `title` varchar(225) NOT NULL,
   `author` varchar(225) NOT NULL,
   `published_date` varchar(225) NOT NULL,
@@ -89,18 +89,18 @@ CREATE TABLE `books` (
   `rating` varchar(45) DEFAULT NULL,
   `description` TEXT DEFAULT NULL,
   `cover` varchar(255) DEFAULT NULL,
-  PRIMARY KEY (`books_id`),
-  KEY `book_id` (`books_id`)
+  PRIMARY KEY (`book_id`),
+  KEY `book_id` (`book_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `books`
+-- Dumping data for table `book`
 --
 
-LOCK TABLES `books` WRITE;
-/*!40000 ALTER TABLE `books` DISABLE KEYS */;
-/*!40000 ALTER TABLE `books` ENABLE KEYS */;
+LOCK TABLES `book` WRITE;
+/*!40000 ALTER TABLE `book` DISABLE KEYS */;
+/*!40000 ALTER TABLE `book` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
