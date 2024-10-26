@@ -35,14 +35,14 @@
   width: 54px;
   height: 54px;
   padding: 6px;
-  border-radius: 30px;
+  border-radius: 8px;
   transition: all 0.3s ease; /* Smooth transition for button background */
   
 }
 
 .logo:hover {
   background-color: #b0afaf;
-  border-radius: 30px;
+  border-radius: 15px;
 }
 
 .search-bar {

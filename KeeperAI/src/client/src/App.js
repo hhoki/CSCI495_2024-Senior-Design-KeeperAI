@@ -36,6 +36,17 @@ const App = () => {
     }
   };
 
+  const handleBookUpdate = (updatedBook) => {
+    setBooks(prevBooks =>
+      prevBooks.map(book =>
+        book.book_id === updatedBook.book_id ? { ...book, ...updatedBook } : book
+      )
+    );
+    setSelectedBook(prevBook => 
+      prevBook.book_id === updatedBook.book_id ? { ...prevBook, ...updatedBook } : prevBook
+    );
+  };
+  
 
   const handleShelfSelect = useCallback((shelfId) => {
     console.log('Selecting shelf with ID:', shelfId);
@@ -144,9 +155,6 @@ const App = () => {
     }
   };
 
-  useEffect(() => {
-    fetchShelves();
-  }, [fetchShelves]);
 
   const handleDragStart = useCallback((e, { book, index }) => {
     console.log('Drag started:', book.title, 'at index', index);
@@ -182,6 +190,21 @@ const App = () => {
     }
   }, [placeholderIndex]);
 
+  const handleDeleteBook = async (bookId) => {
+    try {
+      setBooks(prevBooks => prevBooks.filter(book => book.book_id !== bookId));
+      
+      if (selectedShelf) {
+        const response = await axios.get(`http://localhost:5000/book/shelf/${selectedShelf.id}`);
+        setBooks(response.data.books || []);
+      }
+
+      setSelectedBook(null);
+    } catch (error) {
+      console.error('Error refreshing books after deletion:', error);
+    }
+  };
+
   const handleDrop = useCallback((e) => {
     e.preventDefault();
     console.log('Drop event triggered');
@@ -194,7 +217,7 @@ const App = () => {
       console.log('Drop cancelled: same position or invalid end index');
       return;
     }
-  
+
     setBooks(prevBooks => {
       const newBooks = [...prevBooks];
       const [draggedBook] = newBooks.splice(startIndex, 1);
@@ -209,6 +232,10 @@ const App = () => {
     setDraggedBookIndex(null);
     setPlaceholderIndex(null);
   }, [placeholderIndex]);
+
+  useEffect(() => {
+    fetchShelves();
+  }, [fetchShelves]);
 
   useEffect(() => {
     console.log('Books state updated:', books.map(b => `${b.title} (Shelf: ${b.shelfId})`));
@@ -279,7 +306,12 @@ const App = () => {
         </div>
       </div>
       {selectedBook && (
-        <BookDetailsModal book={selectedBook} onClose={handleCloseModal} />
+        <BookDetailsModal 
+        book={selectedBook} 
+        onClose={handleCloseModal} 
+        onUpdateBook={handleBookUpdate}
+        onDeleteBook={handleDeleteBook}
+      />
       )}
       {isAddShelfModalOpen && (
         <AddShelfModal 

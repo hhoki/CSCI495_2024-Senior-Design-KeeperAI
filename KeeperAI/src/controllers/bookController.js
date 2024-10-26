@@ -72,18 +72,42 @@ exports.getAllBooks = async (req, res, next) => {
   
 
 
-exports.updateBookById = async (req, res, next) => {
-  try {
-    const bookID = req.params.id;
-    const { book_id, shelf_id, title, author, published_date, isbn, rating, description, cover, shelf_location } = req.body;
-    const book = new Book(book_id, shelf_id, title, author, published_date, isbn, rating, description, cover, shelf_location);
-    book.id = bookID;
-    await book.update();
-    res.status(200).json({ message: "Book updated" });
-  } catch (error) {
-    next(error);
-  }
-};
+  exports.updateBookById = async (req, res, next) => {
+    try {
+      const bookId = req.params.id;
+      const { rating, user_notes } = req.body;
+      
+      console.log('Updating book:', {
+        bookId,
+        rating,
+        user_notes
+      });
+  
+      if (rating !== undefined && (isNaN(rating) || rating < 0 || rating > 5)) {
+        return res.status(400).json({ 
+          message: "Rating must be a number between 0 and 5" 
+        });
+      }
+  
+      const updateData = {};
+      if (rating !== undefined) updateData.rating = rating;
+      if (user_notes !== undefined) updateData.user_notes = user_notes;
+  
+      const book = new Book(bookId);
+      await book.update(updateData);
+      
+      res.status(200).json({ 
+        message: "Book updated successfully",
+        book: {
+          book_id: bookId,
+          ...updateData
+        }
+      });
+    } catch (error) {
+      console.error('Error in updateBookById:', error);
+      next(error);
+    }
+  };
 
 exports.deleteBookById = async (req, res, next) => {
   try {

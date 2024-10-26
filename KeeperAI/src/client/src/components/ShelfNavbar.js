@@ -7,7 +7,7 @@ import '../styles/ShelfNavbar.css';
 const ShelfNavbar = ({ shelf, onAddBook, onShelfUpdate, onDeleteShelf }) => {
   const [isAddBooksModalOpen, setIsAddBooksModalOpen] = useState(false);
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const handleAddBook = () => {
     setIsAddBooksModalOpen(true);
@@ -18,12 +18,7 @@ const ShelfNavbar = ({ shelf, onAddBook, onShelfUpdate, onDeleteShelf }) => {
   };
 
   const handleDeleteClick = () => {
-    setIsDeleteModalOpen(true);
-  };
-
-  const handleConfirmDelete = () => {
-    onDeleteShelf(shelf.id);
-    setIsDeleteModalOpen(false);
+    setShowDeleteConfirm(true);
   };
 
   return (
@@ -55,10 +50,14 @@ const ShelfNavbar = ({ shelf, onAddBook, onShelfUpdate, onDeleteShelf }) => {
         />
       )}
       <DeleteConfirmationModal
-        isOpen={isDeleteModalOpen}
-        onClose={() => setIsDeleteModalOpen(false)}
-        onConfirm={handleConfirmDelete}
+        isOpen={showDeleteConfirm}
+        onClose={() => setShowDeleteConfirm(false)}
+        onConfirm={() => {
+          onDeleteShelf(shelf.id);
+          setShowDeleteConfirm(false);
+        }}
         itemName={shelf.name}
+        itemType="shelf"
       />
     </nav>
   );

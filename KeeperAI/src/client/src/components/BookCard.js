@@ -1,5 +1,5 @@
 import React from 'react';
-import { Star } from 'lucide-react';
+import StarRating from './StarRating';
 import '../styles/BookCard.css';
 
 const BookCard = ({ book, index, onDragStart, onDragEnd, isBeingDragged, onClick }) => {
@@ -25,14 +25,10 @@ const BookCard = ({ book, index, onDragStart, onDragEnd, isBeingDragged, onClick
         <h3 className="book-title">{book.title}</h3>
         <p className="book-author">{book.author}</p>
         <div className="book-rating">
-          {[...Array(5)].map((_, i) => (
-            <Star
-              key={i}
-              size={16}
-              fill={i < book.rating ? "yellow" : "none"}
-              color={i < book.rating ? "yellow" : "white"}
-            />
-          ))}
+          <StarRating 
+            rating={Number(book.rating)} 
+            size={16}
+          />
         </div>
       </div>
     </div>

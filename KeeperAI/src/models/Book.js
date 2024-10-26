@@ -82,45 +82,89 @@ class Book {
     }
   }
 
-  async update() {
+  async update(updateData) {
     try {
-      const sql = `
-        UPDATE book
-        SET book_id = ?,
-            shelf_id = ?,
-            title = ?,
-            author = ?,
-            published_date = ?,
-            isbn = ?,
-            rating = ?,
-            cover = ?,
-            shelf_location,
-        WHERE id = ?
-      `;
-      const values = [this.book_id, this.shelf_id, this.title, this.author, this.published_date, this.isbn, this.rating, this.description, this.cover, this.shelf_location];
+      console.log('Updating book with data:', updateData);
+      
+      const updates = [];
+      const values = [];
+      
+      if (updateData.rating !== undefined) {
+        updates.push('rating = ?');
+        values.push(updateData.rating);
+      }
+      
+      if (updateData.user_notes !== undefined) {
+        updates.push('user_notes = ?');
+        values.push(updateData.user_notes);
+      }
+      
+      if (updates.length === 0) {
+        throw new Error('No valid update fields provided');
+      }
 
-      await db.execute(sql, values);
+      values.push(this.book_id); // Add book_id for WHERE clause
+      
+      const sql = `
+        UPDATE book 
+        SET ${updates.join(', ')}
+        WHERE book_id = ?
+      `;
+      
+      console.log('Executing SQL:', sql, 'with values:', values);
+      const [result] = await db.execute(sql, values);
+      
+      if (result.affectedRows === 0) {
+        throw new Error(`No book found with ID ${this.book_id}`);
+      }
+      
+      return true;
     } catch (error) {
+      console.error('Error updating book:', error);
       throw new Error(`Error updating book: ${error.message}`);
     }
   }
 
-  static async deleteById(id) {
-    const tableName = 'book';
-    const detectionTableName = 'book_detections';
+  static async updateNotes(bookId, notes) {
     try {
-      // Delete the row
-      const deleteQuery = `DELETE FROM ${tableName} JOIN ${detectionTableName} on ${tableName}.book_id = ${detectionTableName}.book_id WHERE id = ?`;
-      await db.execute(deleteQuery, [id]);
-      // Re-index the table
-      await this.reindexTable();
-
-      console.log(`Deleted row with ID ${id} from ${tableName} table`);
+      console.log('Updating notes for book:', bookId, 'with:', notes);
+      const sql = `
+        UPDATE book 
+        SET user_notes = ?
+        WHERE book_id = ?
+      `;
+      const values = [notes, bookId];
+      
+      console.log('Executing SQL:', sql, 'with values:', values);
+      const [result] = await db.execute(sql, values);
+      console.log('Update result:', result);
+      
+      if (result.affectedRows === 0) {
+        throw new Error(`No book found with ID ${bookId}`);
+      }
+      
+      return true;
     } catch (error) {
-      console.error(`Error deleting row with ID ${id} from ${tableName} table:`, error);
+      console.error('Error updating book notes:', error);
+      throw new Error(`Error updating book notes: ${error.message}`);
     }
   }
 
+  static async deleteById(id) {
+    try {
+      const deleteBookQuery = `
+        DELETE FROM book 
+        WHERE book_id = ?
+      `;
+      const [result] = await db.execute(deleteBookQuery, [id]);
+  
+      console.log(`Deleted book with ID ${id}`);
+      return result.affectedRows > 0;
+    } catch (error) {
+      console.error(`Error deleting book with ID ${id}:`, error);
+      throw error;
+    }
+  }
   static async deleteByShelfId(shelfId) {
     try {
       console.log(`Deleting books for shelf ID: ${shelfId}`);
