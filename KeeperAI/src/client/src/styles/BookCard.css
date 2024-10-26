@@ -86,3 +86,52 @@
   border: 2px dashed #ccc;
   border-radius: 8px;
 }
+
+.book-state-container {
+  position: absolute;
+  bottom: 0px;
+  right: 0px;
+  z-index: 2;
+  background-color: rgba(0, 0, 0, 0.7);
+  border-radius: 8px 0px 8px 0px;
+  padding: 8px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.2s ease, background-color 0.3s ease;
+}
+
+.book-state-container:hover {
+  transform: scale(1.1);
+  background-color: rgba(0, 0, 0, 0.25);
+}
+
+.book-state-selector {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Remove any previous opacity transitions */
+.book-state-container {
+  opacity: 1;
+}
+
+.book-card:hover .book-state-container {
+  opacity: 1;
+  background-color: rgba(0, 0, 0, 0.0);
+}
+
+
+.book-state-selector.disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.book-state-container:hover:not(.disabled) {
+  background-color: rgba(0, 0, 0, 0.0);
+}
+

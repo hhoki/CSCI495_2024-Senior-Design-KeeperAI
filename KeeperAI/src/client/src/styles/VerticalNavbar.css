@@ -47,16 +47,16 @@
 }
 
 .shelf-description.expanded {
-  max-height: 200px; /* Adjust based on your needs */
+  max-height: 200px;
   padding: 10px 15px;
 }
 
 .add-shelf-button {
-  margin-top: auto; /* Push to the bottom of the flex container */
+  margin-top: auto;
   text-align: left;
-  color: #333; /* Adjust color to match other buttons */
+  color: #333;
 }
 
 .add-shelf-button:hover {
-  background-color: #e0e0e0; /* Same hover effect as other buttons */
+  background-color: #e0e0e0;
 }

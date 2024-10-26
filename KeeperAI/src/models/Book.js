@@ -34,6 +34,15 @@ class Book {
     this.shelf_location = shelf_location;
   }
 
+  static ReadingStatus = {
+    UNSET: 'unset',
+    COMPLETED: 'completed',
+    PAUSED: 'paused',
+    READING: 'reading',
+    FAVORITE: 'favorite',
+    DROPPED: 'dropped'
+  };
+
   async save() {
     try {
       const sql = `
@@ -48,6 +57,43 @@ class Book {
       return result.insertId;
     } catch (error) {
       throw new Error(`Error saving book: ${error.message}`);
+    }
+  }
+
+  // Method to update reading status
+  async updateReadingStatus(status) {
+    try {
+      if (!Object.values(Book.ReadingStatus).includes(status)) {
+        throw new Error('Invalid reading status');
+      }
+
+      const sql = `
+        UPDATE book 
+        SET reading_status = ? 
+        WHERE book_id = ?
+      `;
+      
+      const [result] = await db.execute(sql, [status, this.book_id]);
+      return result.affectedRows > 0;
+    } catch (error) {
+      console.error('Error updating reading status:', error);
+      throw error;
+    }
+  }
+
+  // Method to get books by reading status
+  static async findByReadingStatus(status) {
+    try {
+      const sql = `
+        SELECT * FROM book 
+        WHERE reading_status = ?
+      `;
+      
+      const [rows] = await db.execute(sql, [status]);
+      return rows;
+    } catch (error) {
+      console.error('Error fetching books by reading status:', error);
+      throw error;
     }
   }
 
@@ -98,6 +144,11 @@ class Book {
         updates.push('user_notes = ?');
         values.push(updateData.user_notes);
       }
+
+      if (updateData.reading_status !== undefined) {
+        updates.push('reading_status = ?');
+        values.push(updateData.reading_status);
+      }
       
       if (updates.length === 0) {
         throw new Error('No valid update fields provided');
@@ -121,7 +172,7 @@ class Book {
       return true;
     } catch (error) {
       console.error('Error updating book:', error);
-      throw new Error(`Error updating book: ${error.message}`);
+      throw error;
     }
   }
 

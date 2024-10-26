@@ -42,10 +42,11 @@ const App = () => {
         book.book_id === updatedBook.book_id ? { ...book, ...updatedBook } : book
       )
     );
-    setSelectedBook(prevBook => 
-      prevBook.book_id === updatedBook.book_id ? { ...prevBook, ...updatedBook } : prevBook
-    );
+    if (selectedBook && selectedBook.book_id === updatedBook.book_id) {
+      setSelectedBook(prevBook => ({ ...prevBook, ...updatedBook }));
+    }
   };
+  
   
 
   const handleShelfSelect = useCallback((shelfId) => {
@@ -295,6 +296,7 @@ const App = () => {
                     onDragEnd={handleDragEnd}
                     isBeingDragged={index === draggedBookIndex}
                     onClick={() => handleBookClick(book)}
+                    onUpdateBook={handleBookUpdate}
                   />
                 </React.Fragment>
               ))}

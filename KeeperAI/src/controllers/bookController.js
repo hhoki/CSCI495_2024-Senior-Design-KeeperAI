@@ -75,23 +75,19 @@ exports.getAllBooks = async (req, res, next) => {
   exports.updateBookById = async (req, res, next) => {
     try {
       const bookId = req.params.id;
-      const { rating, user_notes } = req.body;
+      const { rating, user_notes, reading_status } = req.body;
       
       console.log('Updating book:', {
         bookId,
         rating,
-        user_notes
+        user_notes,
+        reading_status
       });
-  
-      if (rating !== undefined && (isNaN(rating) || rating < 0 || rating > 5)) {
-        return res.status(400).json({ 
-          message: "Rating must be a number between 0 and 5" 
-        });
-      }
   
       const updateData = {};
       if (rating !== undefined) updateData.rating = rating;
       if (user_notes !== undefined) updateData.user_notes = user_notes;
+      if (reading_status !== undefined) updateData.reading_status = reading_status;
   
       const book = new Book(bookId);
       await book.update(updateData);
@@ -126,6 +122,40 @@ exports.getBooksByShelfId = async (req, res, next) => {
     res.status(200).json({ books });
   } catch (error) {
     console.error('Error fetching books for shelf:', error);
+    next(error);
+  }
+};
+
+exports.updateReadingStatus = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    const book = new Book(id);
+    const updated = await book.updateReadingStatus(status);
+
+    if (!updated) {
+      return res.status(404).json({ message: "Book not found" });
+    }
+
+    res.status(200).json({ 
+      message: "Reading status updated successfully",
+      book_id: id,
+      reading_status: status
+    });
+  } catch (error) {
+    console.error('Error in updateReadingStatus:', error);
+    next(error);
+  }
+};
+
+exports.getBooksByStatus = async (req, res, next) => {
+  try {
+    const { status } = req.params;
+    const books = await Book.findByReadingStatus(status);
+    res.status(200).json({ books });
+  } catch (error) {
+    console.error('Error in getBooksByStatus:', error);
     next(error);
   }
 };
