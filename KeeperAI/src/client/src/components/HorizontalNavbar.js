@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { Search } from 'lucide-react';
 import SearchResults from './SearchResults';
@@ -66,7 +67,9 @@ const HorizontalNavbar = ({ onBookSelect, onShelfSelect }) => {
   return (
     <nav className="navbar">
       <div className="nav-left">
-        <img src="/images/K [KeeperAI].png" alt="Logo" className="logo" />
+        <Link to="/" className="logo-link">
+          <img src="/images/K [KeeperAI].png" alt="Logo" className="logo" />
+        </Link>
       </div>
       <div className="nav-center" ref={searchContainerRef}>
         <div className="search-bar">

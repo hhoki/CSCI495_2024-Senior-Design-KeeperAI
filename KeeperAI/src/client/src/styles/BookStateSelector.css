@@ -10,7 +10,6 @@
   }
   
   .book-state-selector:hover:not(.disabled) {
-    transform: scale(1.05);
     background-color: rgba(0, 0, 0, 0.05);
   }
   

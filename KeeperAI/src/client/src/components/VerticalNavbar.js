@@ -2,36 +2,37 @@ import React, { useState, useEffect } from 'react';
 import '../styles/VerticalNavbar.css';
 
 const VerticalNavbar = ({ shelves, selectedShelf, onShelfSelect, onAddShelfClick }) => {
-  const [expandedShelf, setExpandedShelf] = useState(null);
-
-  useEffect(() => {
-    console.log('VerticalNavbar - Selected shelf changed:', selectedShelf);
-    if (selectedShelf) {
-      setExpandedShelf(selectedShelf.id || selectedShelf.shelf_id);
-      console.log('Expanding shelf:', selectedShelf.id || selectedShelf.shelf_id);
-    }
-  }, [selectedShelf]);
+  console.log('VerticalNavbar - Current shelves:', shelves);
+  console.log('VerticalNavbar - Selected shelf:', selectedShelf);
 
   const handleShelfClick = (shelf) => {
     console.log('Shelf clicked:', shelf);
-    onShelfSelect(shelf.id || shelf.shelf_id);
+    onShelfSelect(shelf.shelf_id || shelf.id);
   };
-
-  console.log('VerticalNavbar - Rendering with shelves:', shelves);
 
   return (
     <nav className="side-navbar">
       <div className="shelf-buttons-container">
         {shelves.map((shelf) => (
-          <div key={shelf.id || shelf.shelf_id} className="shelf-item">
+          <div key={shelf.shelf_id || shelf.id} className="shelf-item">
             <button
-              className={`shelf-button ${selectedShelf && (selectedShelf.id === shelf.id || selectedShelf.shelf_id === shelf.shelf_id) ? 'selected' : ''}`}
+              className={`shelf-button ${
+                selectedShelf && 
+                (selectedShelf.shelf_id === shelf.shelf_id || selectedShelf.id === shelf.id) 
+                  ? 'selected' 
+                  : ''
+              }`}
               onClick={() => handleShelfClick(shelf)}
             >
-              {shelf.name}
+              {shelf.name || shelf.shelf_name}
             </button>
-            <div className={`shelf-description ${expandedShelf === (shelf.id || shelf.shelf_id) ? 'expanded' : ''}`}>
-              {shelf.description || 'No description'}
+            <div className={`shelf-description ${
+              selectedShelf && 
+              (selectedShelf.shelf_id === shelf.shelf_id || selectedShelf.id === shelf.id) 
+                ? 'expanded' 
+                : ''
+            }`}>
+              {shelf.description || shelf.shelf_description || 'No description'}
             </div>
           </div>
         ))}
