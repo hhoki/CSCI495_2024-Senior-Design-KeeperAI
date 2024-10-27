@@ -1,5 +1,4 @@
 import React from 'react';
-
 import { 
   HelpCircle, 
   CheckCircle, 
@@ -8,6 +7,7 @@ import {
   Star, 
   XCircle 
 } from 'lucide-react';
+import '../styles/BookStateSelector.css';
 
 export const ReadingStatus = {
   UNSET: 'unset',
@@ -34,6 +34,14 @@ const BookStateSelector = ({ currentState = ReadingStatus.UNSET, onStateChange, 
     
     const currentIndex = states.findIndex(state => state.id === currentState);
     const nextIndex = (currentIndex + 1) % states.length;
+    
+    const element = e.currentTarget;
+    element.classList.add('state-change');
+    
+    setTimeout(() => {
+      element.classList.remove('state-change');
+    }, 400); // Match animation duration
+    
     onStateChange(states[nextIndex].id);
   };
 
@@ -43,6 +51,7 @@ const BookStateSelector = ({ currentState = ReadingStatus.UNSET, onStateChange, 
     <div 
       className={`book-state-selector ${disabled ? 'disabled' : ''}`}
       onClick={handleClick}
+      data-state={currentState}
     >
       <CurrentStateIcon 
         size={20}

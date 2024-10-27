@@ -11,7 +11,8 @@ const BookCard = ({
   onDragEnd, 
   isBeingDragged, 
   onClick,
-  onUpdateBook 
+  onUpdateBook,
+  isHighlighted // New prop
 }) => {
   const handleDragStart = (e) => {
     onDragStart(e, { book, index });
@@ -21,7 +22,7 @@ const BookCard = ({
     try {
       console.log('Updating reading status:', newStatus);
       const response = await axios.patch(`http://localhost:5000/book/${book.book_id}`, {
-        reading_status: newStatus  // Changed from status to reading_status
+        reading_status: newStatus
       });
 
       if (response.data && onUpdateBook) {
@@ -34,7 +35,7 @@ const BookCard = ({
 
   return (
     <div 
-      className={`book-card ${isBeingDragged ? 'dragging' : ''}`}
+      className={`book-card ${isBeingDragged ? 'dragging' : ''} ${isHighlighted ? 'highlighted' : ''}`}
       draggable="true"
       onDragStart={handleDragStart}
       onDragEnd={onDragEnd}

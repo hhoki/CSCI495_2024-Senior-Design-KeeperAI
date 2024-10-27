@@ -1,6 +1,8 @@
 const multer = require('multer');
 const path = require('path');
 const Book = require('../models/Book');
+const db = require('../config/db');
+const Shelf = require('../models/Shelf');
 const fs = require('fs').promises;
 
 exports.detectBooks = async (req, res) => {
@@ -105,11 +107,14 @@ exports.getAllBooks = async (req, res, next) => {
     }
   };
 
-exports.deleteBookById = async (req, res, next) => {
+exports.getBookById = async (req, res, next) => {
   try {
     const bookID = req.params.id;
-    await Book.deleteById(bookID);
-    res.status(200).json({ message: "Book deleted" });
+    const book = await Book.findById(bookID);
+    if (!book) {
+      return res.status(404).json({ message: 'Book not found' });
+    }
+    res.status(200).json({ book });
   } catch (error) {
     next(error);
   }
@@ -159,3 +164,61 @@ exports.getBooksByStatus = async (req, res, next) => {
     next(error);
   }
 };
+
+exports.deleteBookById = async (req, res, next) => {
+  try {
+    const bookID = req.params.id;
+    const result = await Book.deleteById(bookID);
+    
+    if (result) {
+      res.status(200).json({ message: "Book deleted successfully" });
+    } else {
+      res.status(404).json({ message: "Book not found" });
+    }
+  } catch (error) {
+    console.error('Error deleting book:', error);
+    next(error);
+  }
+};
+
+exports.searchBooks = async (req, res, next) => {
+  try {
+    const { query } = req.query;
+    console.log('Received search query:', query); // For debugging
+    
+    if (!query || query.trim().length === 0) {
+      return res.status(200).json({ results: [] });
+    }
+
+    //Get all shelves first
+    const shelvesQuery = "SELECT * FROM shelf";
+    const [shelves] = await db.execute(shelvesQuery);
+
+    //Search for books matching the query
+    const searchQuery = `
+      SELECT b.*, s.shelf_name 
+      FROM book b
+      LEFT JOIN shelf s ON b.shelf_id = s.shelf_id
+      WHERE b.title LIKE ? OR b.author LIKE ?
+    `;
+    const searchPattern = `%${query}%`;
+    const [books] = await db.execute(searchQuery, [searchPattern, searchPattern]);
+
+    console.log('Found books:', books); // For debugging
+
+    //Group books by shelf
+    const results = shelves.map(shelf => ({
+      id: shelf.shelf_id,
+      name: shelf.shelf_name,
+      books: books.filter(book => book.shelf_id === shelf.shelf_id)
+    }));
+
+    console.log('Grouped results:', results); // For debugging
+
+    res.status(200).json({ results });
+  } catch (error) {
+    console.error('Search error:', error);
+    next(error);
+  }
+};
+

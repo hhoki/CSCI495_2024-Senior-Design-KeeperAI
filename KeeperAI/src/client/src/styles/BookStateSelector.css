@@ -1,0 +1,28 @@
+.book-state-selector {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    position: relative;
+    padding: 8px;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+  }
+  
+  .book-state-selector:hover:not(.disabled) {
+    transform: scale(1.05);
+    background-color: rgba(0, 0, 0, 0.05);
+  }
+  
+  .book-state-selector.disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+  
+  .book-state-selector svg {
+    transition: opacity 0.02s ease;
+  }
+  
+  .book-state-selector:active:not(.disabled) {
+    transform: scale(0.95);
+  }

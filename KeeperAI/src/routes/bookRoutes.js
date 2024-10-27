@@ -16,6 +16,10 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 router
+  .get('/search', bookController.searchBooks);
+
+
+router
   .route("/")
   .get(bookController.getAllBooks)
   .post(bookController.createBook)
@@ -31,5 +35,6 @@ router
 
 router
   .get("/shelf/:shelfId", bookController.getBooksByShelfId);
+
 
 module.exports = router;

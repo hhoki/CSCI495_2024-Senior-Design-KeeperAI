@@ -261,7 +261,10 @@ const App = () => {
 
   return (
     <div className="app-container">
-      <HorizontalNavbar />
+      <HorizontalNavbar 
+        onBookSelect={(book) => setSelectedBook(book)}
+        onShelfSelect={handleShelfSelect}
+      />
       <div className="main-content">
         <VerticalNavbar
           shelves={shelves}

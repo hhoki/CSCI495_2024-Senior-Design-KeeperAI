@@ -121,3 +121,36 @@
 .dropdown-content a:hover {
   background-color: #f1f1f1;
 }
+
+.nav-center {
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
+  min-width: 300px;
+}
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  background-color: #3c3c3c;
+  border-radius: 15px;
+  transition: background-color 0.3s ease;
+}
+
+.search-bar:focus-within {
+  background-color: #4a4a4a;
+}
+
+.search-input {
+  background-color: transparent;
+  border: none;
+  color: #ffffff;
+  outline: none;
+  width: 250px;
+  margin-left: 8px;
+}
+
+.search-input::placeholder {
+  color: #999;
+}

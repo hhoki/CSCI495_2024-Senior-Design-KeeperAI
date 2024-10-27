@@ -109,7 +109,7 @@ class Book {
 
   static async findById(id) {
     try {
-      const sql = "SELECT * FROM book WHERE id = ?";
+      const sql = "SELECT * FROM book WHERE book_id = ?";
       const [rows] = await db.execute(sql, [id]);
       return rows[0];
     } catch (error) {
@@ -270,6 +270,25 @@ class Book {
     const response = await result.response;
     return response.text();
   }
+
+  static async searchBooks(query) {
+    try {
+      const sql = `
+        SELECT b.*, s.shelf_name 
+        FROM book b
+        LEFT JOIN shelf s ON b.shelf_id = s.shelf_id
+        WHERE b.title LIKE ? OR b.author LIKE ?
+      `;
+      const searchPattern = `%${query}%`;
+      const [rows] = await db.execute(sql, [searchPattern, searchPattern]);
+      return rows;
+    } catch (error) {
+      console.error('Error in Book.searchBooks:', error);
+      throw error;
+    }
+  }
 }
+
+
 
 module.exports = Book;

@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import StarRating from './StarRating';
+import BookStateSelector from './BookStateSelector';
 import DeleteConfirmationModal from './DeleteConfirmationModal';
 import '../styles/BookDetailsModal.css';
 
-const BookDetailsModal = ({ book, onClose, onUpdateBook, onDeleteBook}) => {
+const BookDetailsModal = ({ book, onClose, onUpdateBook, onDeleteBook }) => {
   const [notes, setNotes] = useState(book.user_notes || '');
   const [isEditingNotes, setIsEditingNotes] = useState(false);
   const [currentRating, setCurrentRating] = useState(Number(book.rating) || 0);
@@ -32,25 +33,35 @@ const BookDetailsModal = ({ book, onClose, onUpdateBook, onDeleteBook}) => {
     try {
       setIsSubmitting(true);
       
-      // Log the request data for debugging
-      console.log('Sending rating update:', {
-        book_id: book.book_id,
-        rating: newRating
-      });
-
       const response = await axios.patch(`http://localhost:5000/book/${book.book_id}`, {
         book_id: book.book_id,
         rating: newRating
       });
 
-      console.log('Update response:', response.data);
       setCurrentRating(newRating);
       onUpdateBook && onUpdateBook({ ...book, rating: newRating });
     } catch (error) {
-      console.error('Error updating rating:', error.response?.data || error);
+      console.error('Error updating rating:', error);
       alert('Failed to update rating. Please try again.');
-      // Reset to previous rating on error
       setCurrentRating(book.rating);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleStateChange = async (newStatus) => {
+    try {
+      setIsSubmitting(true);
+      const response = await axios.patch(`http://localhost:5000/book/${book.book_id}`, {
+        reading_status: newStatus
+      });
+
+      if (response.data) {
+        onUpdateBook && onUpdateBook({ ...book, reading_status: newStatus });
+      }
+    } catch (error) {
+      console.error('Error updating reading status:', error);
+      alert('Failed to update reading status. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -76,8 +87,6 @@ const BookDetailsModal = ({ book, onClose, onUpdateBook, onDeleteBook}) => {
     }
   };
 
-  
-
   return (
     <div className="book-details-modal-backdrop" onClick={onClose}>
       <div className="book-details-modal-content" onClick={e => e.stopPropagation()}>
@@ -90,17 +99,28 @@ const BookDetailsModal = ({ book, onClose, onUpdateBook, onDeleteBook}) => {
               className="book-details-cover"
             />
             <div className="book-details-rating-container">
+              <div className="rating-wrapper">
               <StarRating 
                 rating={currentRating}
                 size={24}
                 isEditable={!isSubmitting}
                 onRatingChange={handleRatingChange}
+                inModal={true}
               />
+              </div>
             </div>
           </div>
 
           <div className="book-details-right">
             <h2 className="book-details-title">{book.title}</h2>
+            <div className="book-details-status-row">
+              <BookStateSelector
+                currentState={book.reading_status || 'unset'}
+                onStateChange={handleStateChange}
+                disabled={isSubmitting}
+              />
+              <span className="book-details-status-label">Reading Status</span>
+            </div>
             
             <div className="book-details-info-section">
               <div className="book-details-info-row">
@@ -177,26 +197,25 @@ const BookDetailsModal = ({ book, onClose, onUpdateBook, onDeleteBook}) => {
               )}
             </div>
           </div>
-          
         </div>
+        
         <div className="book-details-actions">
-        <button 
-          className="book-details-delete-button"
-          onClick={handleDeleteClick}
-          disabled={isSubmitting}
-        >
-          Delete Book
-        </button>
-      </div>
+          <button 
+            className="book-details-delete-button"
+            onClick={handleDeleteClick}
+            disabled={isSubmitting}
+          >
+            Delete Book
+          </button>
+        </div>
 
-      <DeleteConfirmationModal
-        isOpen={showDeleteConfirm}
-        onClose={() => setShowDeleteConfirm(false)}
-        onConfirm={handleConfirmDelete}
-        itemName={book.title}
-        itemType="book"
-      />
-
+        <DeleteConfirmationModal
+          isOpen={showDeleteConfirm}
+          onClose={() => setShowDeleteConfirm(false)}
+          onConfirm={handleConfirmDelete}
+          itemName={book.title}
+          itemType="book"
+        />
       </div>
     </div>
   );

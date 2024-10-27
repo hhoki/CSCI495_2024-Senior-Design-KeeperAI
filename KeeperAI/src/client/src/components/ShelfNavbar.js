@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import AddBooksModal from './AddBooksModal';
 import ShelfSettingsModal from './ShelfSettingsModal';
 import DeleteConfirmationModal from './DeleteConfirmationModal';
+import Tooltip from './Tooltip';
 import '../styles/ShelfNavbar.css';
 
 const ShelfNavbar = ({ shelf, onAddBook, onShelfUpdate, onDeleteShelf }) => {
@@ -27,20 +28,39 @@ const ShelfNavbar = ({ shelf, onAddBook, onShelfUpdate, onDeleteShelf }) => {
         <h2 className="shelf-name">{shelf.name}</h2>
       </div>
       <div className="shelf-nav-right">
-        <button onClick={handleAddBook} className="add-button">+</button>
-        <img 
-          src="/images/icons/bag cog.png" 
-          alt="Settings" 
-          className="settings-icon" 
-          onClick={handleSettingsClick}
-        />
-        <button onClick={handleDeleteClick} className="delete-shelf-button">
-          <img src="/images/icons/trash.png" alt="Delete" className="delete-icon" />
-        </button>
+        <Tooltip text="Add Books">
+          <button onClick={handleAddBook} className="add-button">
+            +
+          </button>
+        </Tooltip>
+        
+        <Tooltip text="Shelf Settings">
+          <img 
+            src="/images/icons/bag cog.png" 
+            alt="Settings" 
+            className="settings-icon" 
+            onClick={handleSettingsClick}
+          />
+        </Tooltip>
+        
+        <Tooltip text="Delete Shelf">
+          <button 
+            onClick={handleDeleteClick} 
+            className="delete-shelf-button"
+          >
+            <img 
+              src="/images/icons/trash.png" 
+              alt="Delete" 
+              className="delete-icon" 
+            />
+          </button>
+        </Tooltip>
       </div>
+
       {isAddBooksModalOpen && (
         <AddBooksModal onClose={() => setIsAddBooksModalOpen(false)} />
       )}
+      
       {isSettingsModalOpen && (
         <ShelfSettingsModal
           shelf={shelf}
@@ -49,6 +69,7 @@ const ShelfNavbar = ({ shelf, onAddBook, onShelfUpdate, onDeleteShelf }) => {
           onSave={onShelfUpdate}
         />
       )}
+      
       <DeleteConfirmationModal
         isOpen={showDeleteConfirm}
         onClose={() => setShowDeleteConfirm(false)}

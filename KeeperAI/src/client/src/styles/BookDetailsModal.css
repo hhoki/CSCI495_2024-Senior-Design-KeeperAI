@@ -92,6 +92,16 @@
     text-align: center;
   }
   
+  .rating-wrapper {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .numeric-rating {
+    color: #666;
+    font-size: 16px;
+  }
   .book-details-stars {
     display: flex;
     justify-content: center;
@@ -200,6 +210,83 @@
     background-color: #f44336;
     color: white;
   }
+
+  .book-details-status-container {
+    margin-top: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .book-details-status-label {
+    font-size: 14px;
+    color: #666;
+    text-align: center;
+  }
+
+  .book-details-left {
+    flex: 0 0 300px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .book-state-selector {
+    padding: 8px;
+    border-radius: 50%;
+    transition: background-color 0.2s ease;
+  }
+  
+  .book-state-selector:hover:not(.disabled) {
+    background-color: rgba(0, 0, 0, 0.05);
+  }
+
+  .book-details-title {
+    margin: 0 0 12px 0;
+    font-size: 24px;
+    color: #333;
+  }
+  
+  .book-details-status-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #eee;
+    user-select: none;
+    -webkit-user-select: none; 
+    -moz-user-select: none;
+    -ms-user-select: none;
+  }
+  
+  .book-details-status-label {
+    font-size: 14px;
+    color: #666;
+    pointer-events: none; /* Additionally prevents any mouse interactions with the text */
+  }
+  
+  .book-state-selector {
+    padding: 4px;
+    border-radius: 50%;
+    transition: background-color 0.2s ease;
+  }
+  
+  .book-state-selector:hover:not(.disabled) {
+    background-color: #f0f0f0;
+  }
+  
+  .book-details-info-section {
+    margin-top: 0;
+  }
+  
+  .book-details-right {
+    flex: 1;
+    min-width: 0;
+    padding-top: 8px;
+  }
+  
   
   @media (max-width: 768px) {
     .book-details-layout {

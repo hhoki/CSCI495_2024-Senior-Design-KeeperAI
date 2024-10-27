@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import '../styles/StarRating.css';
 
-const StarRating = ({ rating, size = 24, className = '', isEditable = false, onRatingChange }) => {
+const StarRating = ({ rating, size = 24, className = '', isEditable = false, onRatingChange, inModal = false }) => {
   const [isEditingRating, setIsEditingRating] = useState(false);
   const [inputValue, setInputValue] = useState(rating);
 
@@ -96,7 +96,9 @@ const StarRating = ({ rating, size = 24, className = '', isEditable = false, onR
             autoFocus
           />
         ) : (
-          <span>({Number(rating).toFixed(1)})</span>
+          <span className={`rating-value ${inModal ? 'in-modal' : ''}`}>
+            ({Number(rating).toFixed(1)})
+          </span>
         )}
       </div>
     </div>
