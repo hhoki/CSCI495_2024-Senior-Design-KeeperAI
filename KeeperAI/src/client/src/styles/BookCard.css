@@ -101,6 +101,7 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  
   transition: transform 0.2s ease, background-color 0.3s ease;
 }
 
@@ -121,7 +122,14 @@
 
 .book-card:hover .book-state-container {
   opacity: 1;
+  
   background-color: rgba(0, 0, 0, 0.0);
+}
+
+.book-card:hover {
+  scale: 1.02;
+  transform: translateY(-6px);
+  transition: transform 0.4s ease, scale 0.6s ease-in-out;
 }
 
 

@@ -1,67 +1,41 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import axios from 'axios';
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { Search } from 'lucide-react';
 import SearchResults from './SearchResults';
+import axios from 'axios';
 import '../styles/HorizontalNavbar.css';
 
-const HorizontalNavbar = ({ onBookSelect, onShelfSelect }) => {
+const HorizontalNavbar = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
-  const searchTimeoutRef = useRef(null);
-  const searchContainerRef = useRef(null);
-
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (searchContainerRef.current && !searchContainerRef.current.contains(event.target)) {
-        setSearchResults([]);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+  const navigate = useNavigate();
 
   const handleSearch = async (query) => {
     setSearchQuery(query);
-    
-    if (searchTimeoutRef.current) {
-      clearTimeout(searchTimeoutRef.current);
-    }
-
     if (!query.trim()) {
       setSearchResults([]);
       return;
     }
 
-    searchTimeoutRef.current = setTimeout(async () => {
+    try {
       setIsSearching(true);
-      try {
-        const response = await axios.get(`http://localhost:5000/book/search?query=${encodeURIComponent(query)}`);
-        setSearchResults(response.data.results);
-      } catch (error) {
-        console.error('Error searching books:', error);
-        setSearchResults([]);
-      } finally {
-        setIsSearching(false);
-      }
-    }, 300);
+      const response = await axios.get(`http://localhost:5000/book/search?query=${encodeURIComponent(query)}`);
+      setSearchResults(response.data.results);
+    } catch (error) {
+      console.error('Error searching:', error);
+      setSearchResults([]);
+    } finally {
+      setIsSearching(false);
+    }
   };
 
   const handleResultClick = (book, shelfId) => {
-    // Navigate to shelf
-    onShelfSelect(shelfId);
-    
-    // After a short delay to allow shelf content to load, open book details
-    setTimeout(() => {
-      onBookSelect(book);
-    }, 100);
-    
-    // Clear search
-    setSearchResults([]);
-    setSearchQuery('');
+    // Navigate to library with the specific shelf and potentially highlight the book
+    navigate(`/library?shelfId=${shelfId}`);
+    setSearchResults([]); // Clear search results
+    setSearchQuery(''); // Clear search query
   };
 
   return (
@@ -71,7 +45,7 @@ const HorizontalNavbar = ({ onBookSelect, onShelfSelect }) => {
           <img src="/images/K [KeeperAI].png" alt="Logo" className="logo" />
         </Link>
       </div>
-      <div className="nav-center" ref={searchContainerRef}>
+      <div className="nav-center">
         <div className="search-bar">
           <Search className="search-icon" size={16} color="#ffffff" />
           <input

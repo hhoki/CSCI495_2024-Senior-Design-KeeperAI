@@ -12,7 +12,7 @@ const BookCard = ({
   isBeingDragged, 
   onClick,
   onUpdateBook,
-  isHighlighted // New prop
+  isHighlighted
 }) => {
   const handleDragStart = (e) => {
     onDragStart(e, { book, index });
@@ -43,7 +43,7 @@ const BookCard = ({
       data-index={index}
     >
       <img 
-        src={book.cover || "/api/placeholder/192/288"} 
+        src={book.cover || "placeholder"} 
         alt={`Cover of ${book.title}`}
         className="book-cover"
       />
