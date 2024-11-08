@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Search } from 'lucide-react';
 import SearchResults from './SearchResults';
@@ -10,10 +10,11 @@ const HorizontalNavbar = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
+  const [showResults, setShowResults] = useState(false);
+  const searchTimeoutRef = useRef(null);
   const navigate = useNavigate();
 
-  const handleSearch = async (query) => {
-    setSearchQuery(query);
+  const performSearch = useCallback(async (query) => {
     if (!query.trim()) {
       setSearchResults([]);
       return;
@@ -29,14 +30,43 @@ const HorizontalNavbar = () => {
     } finally {
       setIsSearching(false);
     }
+  }, []);
+
+  const handleSearch = (e) => {
+    const query = e.target.value;
+    setSearchQuery(query);
+
+    // Show results container immediately when typing starts
+    if (query.trim()) {
+      setShowResults(true);
+    }
+
+    // Clear existing timeout
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+
+    // Set new timeout for search
+    searchTimeoutRef.current = setTimeout(() => {
+      performSearch(query);
+    }, 300); // 300ms delay
   };
 
   const handleResultClick = (book, shelfId) => {
-    // Navigate to library with the specific shelf and potentially highlight the book
     navigate(`/library?shelfId=${shelfId}`);
-    setSearchResults([]); // Clear search results
-    setSearchQuery(''); // Clear search query
+    setSearchQuery('');
+    setShowResults(false);
+    setSearchResults([]);
   };
+
+  // Clear search on unmount
+  React.useEffect(() => {
+    return () => {
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
+    };
+  }, []);
 
   return (
     <nav className="navbar">
@@ -53,15 +83,23 @@ const HorizontalNavbar = () => {
             placeholder="Search..."
             className="search-input"
             value={searchQuery}
-            onChange={(e) => handleSearch(e.target.value)}
+            onChange={handleSearch}
+            onFocus={() => {
+              if (searchQuery.trim()) {
+                setShowResults(true);
+              }
+            }}
           />
         </div>
-        <SearchResults
-          results={searchResults}
-          onResultClick={handleResultClick}
-          isLoading={isSearching}
-        />
+        {showResults && (
+          <SearchResults
+            results={searchResults}
+            onResultClick={handleResultClick}
+            isLoading={isSearching}
+          />
+        )}
       </div>
+
       <div className="nav-right">
         <img
           src="https://cdn1.iconfinder.com/data/icons/essentials-pack/96/user_account_profile_avatar_person-512.png"

@@ -47,6 +47,9 @@ const Library = () => {
     }
   };
   
+  const handleBooksAdded = (newBooks) => {
+    setBooks(prevBooks => [...prevBooks, ...newBooks]);
+  };
   
 
   const handleShelfSelect = useCallback(async (shelfId) => {
@@ -309,7 +312,7 @@ const Library = () => {
         {selectedShelf && (
           <ShelfNavbar
             shelf={selectedShelf}
-            onAddBook={() => {}}
+            onAddBook={handleBooksAdded} // Pass the handler here
             onShelfUpdate={handleShelfUpdate}
             onDeleteShelf={() => deleteShelf(selectedShelf.id)}
           />

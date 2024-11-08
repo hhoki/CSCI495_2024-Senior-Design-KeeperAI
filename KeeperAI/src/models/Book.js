@@ -21,17 +21,18 @@ const generationConfig = {
 };
 
 class Book {
-  constructor(book_id, shelf_id, title, author, published_date, isbn, rating, description, cover, shelf_location) {
-    this.book_id = book_id;
-    this.shelf_id = shelf_id;
-    this.title = title;
-    this.author = author;
-    this.published_date = published_date;
-    this.isbn = isbn;
-    this.rating = rating;
-    this.description = description;
-    this.cover = cover;
-    this.shelf_location = shelf_location;
+  constructor(book_id, shelf_id, title, author, published_date, isbn, rating, description, user_notes, cover, shelf_location) {
+    this.book_id = book_id === undefined ? null : book_id;
+    this.shelf_id = shelf_id === undefined ? null : shelf_id;
+    this.title = title || '';
+    this.author = author || 'Unknown';
+    this.published_date = published_date === undefined ? null : published_date;
+    this.isbn = isbn === undefined ? null : isbn;
+    this.rating = rating === undefined ? null : rating;
+    this.description = description === undefined ? null : description;
+    this.user_notes = user_notes || '';
+    this.cover = cover === undefined ? null : cover;
+    this.shelf_location = shelf_location === undefined ? null : shelf_location;
   }
 
   static ReadingStatus = {
@@ -45,39 +46,53 @@ class Book {
 
   async save() {
     try {
+      // Log the sanitized data before saving
+      console.log('Attempting to save book with data:', {
+        shelf_id: this.shelf_id,
+        title: this.title,
+        author: this.author,
+        published_date: this.published_date,
+        isbn: this.isbn,
+        rating: this.rating,
+        description: this.description,
+        user_notes: this.user_notes,
+        cover: this.cover,
+        shelf_location: this.shelf_location
+      });
+
       const sql = `
-        INSERT INTO book(
-          book_id, shelf_id, title, author, published_date, isbn, rating, description, cover, shelf_location
+        INSERT INTO book (
+          shelf_id, title, author, published_date, isbn, rating, 
+          description, user_notes, cover, shelf_location
         )
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `;
-      const values = [this.book_id, this.shelf_id, this.title, this.author, this.published_date, this.isbn, this.rating, this.description, this.cover, this.shelf_location];
+
+      const values = [
+        this.shelf_id,
+        this.title,
+        this.author,
+        this.published_date,
+        this.isbn,
+        this.rating,
+        this.description,
+        this.user_notes,
+        this.cover,
+        this.shelf_location
+      ];
+
+      // Verify no undefined values
+      const hasUndefined = values.some(value => value === undefined);
+      if (hasUndefined) {
+        console.error('Found undefined values in:', values);
+        throw new Error('Cannot save book with undefined values');
+      }
 
       const [result] = await db.execute(sql, values);
       return result.insertId;
     } catch (error) {
+      console.error('Error in Book.save():', error);
       throw new Error(`Error saving book: ${error.message}`);
-    }
-  }
-
-  // Method to update reading status
-  async updateReadingStatus(status) {
-    try {
-      if (!Object.values(Book.ReadingStatus).includes(status)) {
-        throw new Error('Invalid reading status');
-      }
-
-      const sql = `
-        UPDATE book 
-        SET reading_status = ? 
-        WHERE book_id = ?
-      `;
-      
-      const [result] = await db.execute(sql, [status, this.book_id]);
-      return result.affectedRows > 0;
-    } catch (error) {
-      console.error('Error updating reading status:', error);
-      throw error;
     }
   }
 
@@ -251,24 +266,117 @@ class Book {
   }
 
 
-  static async uploadToGemini(path, mimeType) {
-    const fs = require('fs').promises;
-    const imageData = await fs.readFile(path);
-    return {
-      inlineData: {
-        data: imageData.toString('base64'),
-        mimeType: mimeType
-      }
-    };
+  static async uploadToGemini(imagePath, mimeType, displayName) {
+    try {
+      const uploadResult = await fileManager.uploadFile(imagePath, {
+        mimeType,
+        displayName,
+      });
+      console.log(`Uploaded file ${displayName} as: ${uploadResult.file.uri}`);
+      return uploadResult;
+    } catch (error) {
+      console.error("Error uploading file to Google Gemini:", error);
+      throw error;
+    }
   }
 
-  static async generateContent(file) {
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
-    const prompt = "Analyze this image and tell me the titles of the books you see. List only the titles, not the authors.";
-    
-    const result = await model.generateContent([prompt, file]);
-    const response = await result.response;
-    return response.text();
+  static async generateContentFromImage(fileUri, mimeType) {
+    try {
+      const schema = {
+        description: "List of detected book titles",
+        type: "array",
+        items: {
+          type: "object",
+          properties: {
+            bookTitle: {
+              type: "string",
+              description: "Title of the book detected in the image",
+              nullable: false,
+            },
+          },
+          required: ["bookTitle"],
+        },
+      };
+
+      const model = genAI.getGenerativeModel({
+        model: "gemini-1.5-flash",
+        generationConfig: {
+          responseMimeType: "application/json",
+          responseSchema: schema,
+        },
+      });
+
+      const result = await model.generateContent([
+        "Analyze this image and tell me the titles of the books you see. List only the titles, not the authors. The titles should follow standard title capitalization rules.",
+        {
+          fileData: {
+            fileUri,
+            mimeType,
+          },
+        },
+      ]);
+
+      console.log("Generated Content from Google Gemini:", result.response.text());
+      return JSON.parse(result.response.text());
+    } catch (error) {
+      console.error("Error generating content from image:", error);
+      throw error;
+    }
+  }
+
+  static async fetchOpenLibraryMetadata(bookTitles) {
+    try {
+      const bookMetadata = await Promise.all(
+        bookTitles.map(async (bookTitle) => {
+          try {
+            const queryTitle = encodeURIComponent(bookTitle);
+            const response = await axios.get(`https://openlibrary.org/search.json?title=${queryTitle}&fields=title,author_name,first_publish_year,isbn,cover_i,description,subtitle&limit=1`);
+
+            if (response.data.docs && response.data.docs.length > 0) {
+              const book = response.data.docs[0];
+              return {
+                title: bookTitle,
+                author: book.author_name ? book.author_name[0] : "Unknown",
+                published_date: book.first_publish_year || "N/A",
+                isbn: book.isbn ? book.isbn[0] : "N/A",
+                cover: book.cover_i ? `https://covers.openlibrary.org/b/id/${book.cover_i}-L.jpg` : null,
+                description: book.subtitle || "No description available",
+                rating: null,
+                user_notes: "",
+                shelf_id: null,
+                shelf_location: null
+              };
+            } else {
+              return {
+                title: bookTitle,
+                author: "Unknown",
+                published_date: "N/A",
+                isbn: "N/A",
+                cover: null,
+                description: "No description available",
+                rating: null,
+                user_notes: "",
+                shelf_id: null,
+                shelf_location: null,
+                message: "No metadata found in OpenLibrary"
+              };
+            }
+          } catch (error) {
+            console.error(`Error fetching metadata for "${bookTitle}":`, error);
+            return {
+              title: bookTitle,
+              message: "Error fetching metadata",
+              error: error.message
+            };
+          }
+        })
+      );
+
+      return bookMetadata;
+    } catch (error) {
+      console.error("Error in fetchOpenLibraryMetadata:", error);
+      throw error;
+    }
   }
 
   static async searchBooks(query) {

@@ -10,57 +10,59 @@ const ShelfNavbar = ({ shelf, onAddBook, onShelfUpdate, onDeleteShelf }) => {
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
-  const handleAddBook = () => {
-    setIsAddBooksModalOpen(true);
+  const handleBooksAdded = (newBooks) => {
+    if (onAddBook) {
+      onAddBook(newBooks);
+    }
+    setIsAddBooksModalOpen(false);
   };
 
-  const handleSettingsClick = () => {
-    setIsSettingsModalOpen(true);
-  };
-
-  const handleDeleteClick = () => {
-    setShowDeleteConfirm(true);
-  };
+  // Make sure we're using the correct shelf ID property
+  const shelfId = shelf.shelf_id || shelf.id;
 
   return (
     <nav className="shelf-navbar">
       <div className="shelf-nav-left">
-        <h2 className="shelf-name">{shelf.name}</h2>
+        <h2 className="shelf-name">{shelf.name || shelf.shelf_name}</h2>
       </div>
       <div className="shelf-nav-right">
         <Tooltip text="Add Books">
-          <button onClick={handleAddBook} className="add-button">
+          <button onClick={() => setIsAddBooksModalOpen(true)} className="add-button">
             +
           </button>
         </Tooltip>
-        
+
         <Tooltip text="Shelf Settings">
-          <img 
-            src="/images/icons/bag cog.png" 
-            alt="Settings" 
-            className="settings-icon" 
-            onClick={handleSettingsClick}
+          <img
+            src="/images/icons/bag cog.png"
+            alt="Settings"
+            className="settings-icon"
+            onClick={() => setIsSettingsModalOpen(true)}
           />
         </Tooltip>
-        
+
         <Tooltip text="Delete Shelf">
-          <button 
-            onClick={handleDeleteClick} 
+          <button
+            onClick={() => setShowDeleteConfirm(true)}
             className="delete-shelf-button"
           >
-            <img 
-              src="/images/icons/trash.png" 
-              alt="Delete" 
-              className="delete-icon" 
+            <img
+              src="/images/icons/trash.png"
+              alt="Delete"
+              className="delete-icon"
             />
           </button>
         </Tooltip>
       </div>
 
       {isAddBooksModalOpen && (
-        <AddBooksModal onClose={() => setIsAddBooksModalOpen(false)} />
+        <AddBooksModal
+          onClose={() => setIsAddBooksModalOpen(false)}
+          shelfId={shelf.shelf_id}
+          onBooksAdded={handleBooksAdded} // Pass the handler to the modal
+        />
       )}
-      
+
       {isSettingsModalOpen && (
         <ShelfSettingsModal
           shelf={shelf}
@@ -69,15 +71,15 @@ const ShelfNavbar = ({ shelf, onAddBook, onShelfUpdate, onDeleteShelf }) => {
           onSave={onShelfUpdate}
         />
       )}
-      
+
       <DeleteConfirmationModal
         isOpen={showDeleteConfirm}
         onClose={() => setShowDeleteConfirm(false)}
         onConfirm={() => {
-          onDeleteShelf(shelf.id);
+          onDeleteShelf(shelfId);
           setShowDeleteConfirm(false);
         }}
-        itemName={shelf.name}
+        itemName={shelf.name || shelf.shelf_name}
         itemType="shelf"
       />
     </nav>

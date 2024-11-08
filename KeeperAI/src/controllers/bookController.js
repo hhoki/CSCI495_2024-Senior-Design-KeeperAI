@@ -4,9 +4,11 @@ const Book = require('../models/Book');
 const db = require('../config/db');
 const Shelf = require('../models/Shelf');
 const fs = require('fs').promises;
+const axios = require('axios');
 
 exports.detectBooks = async (req, res) => {
   console.log('Detect Books function called');
+
   if (!req.file) {
     console.log('No file uploaded');
     return res.status(400).json({ message: 'No file uploaded.' });
@@ -19,26 +21,180 @@ exports.detectBooks = async (req, res) => {
     console.log('File path:', filePath);
     console.log('MIME type:', mimeType);
 
-    //Prepare the file for Gemini
-    const fileData = await Book.uploadToGemini(filePath, mimeType);
-    console.log('File prepared for Gemini');
+    // Upload the image file to Google Gemini
+    const uploadResult = await Book.uploadToGemini(filePath, mimeType, req.file.originalname);
+    console.log('File uploaded to Gemini');
 
-    //Generate content using Gemini
-    const resultText = await Book.generateContent(fileData);
-    console.log('Gemini result:', resultText);
+    // Generate content (detect book titles) from the uploaded image
+    const bookTitles = await Book.generateContentFromImage(uploadResult.file.uri, mimeType);
+    console.log('Detected book titles from Gemini:', bookTitles);
 
-    res.json({ result: resultText });
+    res.status(200).json({
+      message: "Books detected successfully",
+      bookTitles: bookTitles
+    });
+
   } catch (error) {
     console.error('Error during book detection:', error);
-    res.status(500).json({ message: 'Failed to detect books from the image.', error: error.toString() });
+    res.status(500).json({
+      message: 'Failed to detect books.',
+      error: error.toString()
+    });
   } finally {
-    //Clean up the uploaded file
-    const fs = require('fs').promises;
+    // Clean up the uploaded file
     await fs.unlink(filePath).catch(console.error);
   }
 };
 
+exports.fetchOpenLibraryMetadata = async (req, res) => {
+  try {
+    const { bookTitles } = req.body;
 
+    if (!bookTitles || !Array.isArray(bookTitles)) {
+      return res.status(400).json({
+        message: 'Invalid request. Expected array of book titles.'
+      });
+    }
+
+// OpenLibary Implementation
+/*     const bookMetadata = await Promise.all(
+      bookTitles.map(async (bookTitle) => {
+        try {
+          // Search OpenLibrary API
+          const openLibraryUrl = `https://openlibrary.org/search.json?title=${encodeURIComponent(bookTitle)}&fields=title,author_name,first_publish_year,isbn,cover_i,description,subtitle&limit=1`;
+          const response = await axios.get(openLibraryUrl);
+
+
+          if (response.data.docs && response.data.docs.length > 0) {
+            const book = response.data.docs[0];
+            return {
+              title: bookTitle, // Use detected title from image
+              author: book.author_name ? book.author_name[0] : "Unknown",
+              published_date: book.first_publish_year || "N/A",
+              isbn: book.isbn ? book.isbn[0] : "N/A",
+              cover: book.cover_i ? `https://covers.openlibrary.org/b/id/${book.cover_i}-L.jpg` : null,
+              description: book.description || "No description available",
+              rating: null,
+              user_notes: "",
+              shelf_id: null,
+              shelf_location: null
+            };
+          } else {
+            return {
+              title: bookTitle,
+              author: "Unknown",
+              published_date: "N/A",
+              isbn: "N/A",
+              cover: null,
+              description: "No description available",
+              rating: null,
+              user_notes: "",
+              shelf_id: null,
+              shelf_location: null,
+              message: "No metadata found in OpenLibrary"
+            };
+          }
+        } catch (error) {
+          console.error(`Error fetching metadata for "${bookTitle}":`, error);
+          return {
+            title: bookTitle,
+            message: "Error fetching metadata",
+            error: error.message
+          };
+        }
+      })
+    );
+
+    res.status(200).json({
+      message: "Metadata fetched successfully",
+      books: bookMetadata
+    });
+ */
+
+
+    const bookMetadata = await Promise.all(
+      bookTitles.map(async (bookTitle) => {
+        try {
+          // Search Google Books API
+          const googleBooksUrl = `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(bookTitle)}&key=${process.env.GOOGLE_BOOKS_API_KEY}&maxResults=1`;
+          const response = await axios.get(googleBooksUrl);
+
+          if (response.data.items && response.data.items.length > 0) {
+            const book = response.data.items[0].volumeInfo;
+            return {
+              title: bookTitle, // Use detected title from image
+              author: book.authors ? book.authors[0] : "Unknown",
+              published_date: book.publishedDate || "N/A",
+              isbn: book.industryIdentifiers ?
+                book.industryIdentifiers.find(id => id.type === "ISBN_13")?.identifier ||
+                book.industryIdentifiers.find(id => id.type === "ISBN_10")?.identifier ||
+                "N/A" : "N/A",
+              cover: book.imageLinks ?
+                // Use high quality image if available
+                book.imageLinks.medium ||
+                book.imageLinks.large ||
+                book.imageLinks.extraLarge ||
+                book.imageLinks.thumbnail?.replace('zoom=1', 'zoom=3') ||
+                null : null,
+              description: book.description || "No description available",
+              rating: null,
+              page_count: book.pageCount || null,
+              categories: book.categories || [],
+              language: book.language || "N/A",
+              publisher: book.publisher || "N/A",
+              user_notes: "",
+              shelf_id: null,
+              shelf_location: null
+            };
+          } else {
+            return {
+              title: bookTitle,
+              author: "Unknown",
+              published_date: "N/A",
+              isbn: "N/A",
+              cover: null,
+              description: "No description available",
+              rating: null,
+              user_notes: "",
+              shelf_id: null,
+              shelf_location: null,
+              message: "No metadata found in Google Books"
+            };
+          }
+        } catch (error) {
+          console.error(`Error fetching metadata for "${bookTitle}":`, error);
+
+          // Check for API key related errors
+          if (error.response?.status === 403) {
+            return {
+              title: bookTitle,
+              message: "API key error - please check your Google Books API key",
+              error: error.message
+            };
+          }
+
+          return {
+            title: bookTitle,
+            message: "Error fetching metadata",
+            error: error.message
+          };
+        }
+      })
+    );
+
+    res.status(200).json({
+      message: "Metadata fetched successfully",
+      books: bookMetadata
+    });
+
+  } catch (error) {
+    console.error('Error fetching metadata:', error);
+    res.status(500).json({
+      message: 'Failed to fetch book metadata.',
+      error: error.toString()
+    });
+  }
+};
 
 
 exports.getAllBooks = async (req, res, next) => {
@@ -222,3 +378,67 @@ exports.searchBooks = async (req, res, next) => {
   }
 };
 
+exports.addBatchBooks = async (req, res, next) => {
+  try {
+    const books = req.body;
+    const savedBooks = [];
+
+    console.log('Received books data:', books); // Debug log
+
+    for (const bookData of books) {
+      console.log('Processing book with shelf_id:', bookData.shelf_id); // Debug log
+
+      if (!bookData.shelf_id) {
+        console.error('Missing shelf_id for book:', bookData.title);
+        continue; // Skip books without shelf_id
+      }
+
+      // Format and sanitize data
+      const sanitizedBook = {
+        shelf_id: bookData.shelf_id,
+        title: bookData.title || '',
+        author: bookData.author || 'Unknown',
+        published_date: bookData.published_date || null,
+        isbn: bookData.isbn || null,
+        rating: bookData.rating === undefined ? null : bookData.rating,
+        description: bookData.description || null,
+        user_notes: bookData.user_notes || '',
+        cover: bookData.cover || null,
+        shelf_location: bookData.shelf_location || null
+      };
+
+      const book = new Book(
+        null,
+        sanitizedBook.shelf_id,
+        sanitizedBook.title,
+        sanitizedBook.author,
+        sanitizedBook.published_date,
+        sanitizedBook.isbn,
+        sanitizedBook.rating,
+        sanitizedBook.description,
+        sanitizedBook.user_notes,
+        sanitizedBook.cover,
+        sanitizedBook.shelf_location
+      );
+
+      try {
+        const bookId = await book.save();
+        savedBooks.push({
+          ...sanitizedBook,
+          book_id: bookId
+        });
+        console.log(`Successfully saved book with ID: ${bookId} to shelf: ${sanitizedBook.shelf_id}`);
+      } catch (error) {
+        console.error(`Failed to save book "${bookData.title}":`, error);
+      }
+    }
+
+    res.status(201).json({
+      message: `Successfully added ${savedBooks.length} books`,
+      books: savedBooks
+    });
+  } catch (error) {
+    console.error('Error in batch book addition:', error);
+    next(error);
+  }
+};

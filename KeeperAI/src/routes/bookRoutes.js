@@ -25,7 +25,14 @@ router
   .post(bookController.createBook)
   
 router
-  .post("/upload", upload.single('file'), bookController.detectBooks);
+  .post('/detect', upload.single('bookImage'), bookController.detectBooks);
+
+router
+  .post('/batch', bookController.addBatchBooks);
+
+
+router
+  .post('/metadata', bookController.fetchOpenLibraryMetadata);
 
 router
   .route("/:id")
