@@ -128,3 +128,39 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+node_modules
+.pnp
+.pnp.js
+
+# Production
+/dist
+/build
+
+# Environment files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Editor directories
+.vscode
+.idea
+*.swp
+*.swo
+
+# Operating System
+.DS_Store
+Thumbs.db
+
+# Ignore uploads directory but keep the folder
+uploads/*
+!uploads/.gitkeep
+uploads/covers/*
+!uploads/covers/.gitkeep

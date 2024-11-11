@@ -94,6 +94,9 @@ CREATE TABLE `book` (
   `cover` varchar(255) DEFAULT NULL,
   `shelf_location` varchar(45) DEFAULT NULL,
   `date_added` datetime DEFAULT CURRENT_TIMESTAMP,
+  `genres` JSON DEFAULT NULL,
+  `publisher` VARCHAR(255) NULL DEFAULT NULL,
+  `page_count` INT NULL DEFAULT NULL,
   PRIMARY KEY (`book_id`),
   KEY `shelf_id` (`shelf_id`),
   CONSTRAINT `shelf_id` FOREIGN KEY (`shelf_id`) REFERENCES `shelf` (`shelf_id`)

@@ -1,0 +1,375 @@
+.book-details-modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+}
+
+.book-details-modal-content {
+  background-color: white;
+  width: 85%;
+  max-width: 1100px;
+  height: 70%;
+  border-radius: 8px;
+  position: relative;
+  overflow: auto;
+  padding: 20px;
+}
+
+.book-details-close-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #333;
+  z-index: 1;
+}
+
+.book-details-layout {
+  display: flex;
+  gap: 30px;
+  margin-top: 20px;
+}
+
+.book-details-left {
+  flex: 0 0 300px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.book-details-cover {
+  width: 100%;
+  height: auto;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.book-details-rating-container {
+  margin-top: 15px;
+  text-align: center;
+}
+
+.rating-wrapper {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.book-details-right {
+  flex: 1;
+  min-width: 0;
+}
+
+.book-details-title {
+  margin: 0 0 12px 0;
+  font-size: 24px;
+  font-weight: 600;
+  color: #333;
+}
+
+.book-details-genres {
+  display: flex;
+  user-select: none;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.genre-tag {
+  background-color: #f0f0f0;
+  color: #333;
+  padding: 4px 12px;
+  border-radius: 16px;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  border: 1px solid #e0e0e0;
+}
+
+.genre-tag:hover {
+  background-color: #e8e8e8;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.book-details-status-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #eee;
+}
+
+.book-details-status-label {
+  font-size: 14px;
+  color: #666;
+}
+
+.book-details-info-section {
+  margin-bottom: 20px;
+}
+
+.book-details-info-row {
+  margin-bottom: 10px;
+  display: flex;
+  align-items: baseline;
+}
+
+.book-details-info-label {
+  font-weight: 600;
+  color: #666;
+  width: 100px;
+  flex-shrink: 0;
+}
+
+.book-details-info-value {
+  color: #333;
+}
+
+.book-details-description-section {
+  margin-bottom: 20px;
+}
+
+.book-details-description-heading {
+  font-size: 18px;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.book-details-notes-section {
+  border-top: 1px solid #eee;
+  padding-top: 20px;
+}
+
+.book-details-notes-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.book-details-edit-button {
+  padding: 5px 15px;
+  background-color: #f0f0f0;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.book-details-edit-button:hover {
+  background-color: #e0e0e0;
+}
+
+.book-details-notes-edit {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.book-details-notes-textarea {
+  width: 100%;
+  min-height: 100px;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  resize: vertical;
+  font-family: inherit;
+}
+
+.book-details-notes-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.book-details-save-button,
+.book-details-cancel-button {
+  padding: 5px 15px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.book-details-save-button {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.book-details-save-button:hover {
+  background-color: #45a049;
+}
+
+.book-details-cancel-button {
+  background-color: #f44336;
+  color: white;
+}
+
+.book-details-cancel-button:hover {
+  background-color: #d32f2f;
+}
+
+.book-details-actions {
+  margin-top: 20px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.book-details-delete-button {
+  padding: 8px 16px;
+  background-color: transparent;
+  color: #ff4444;
+  border: 1px solid #ff4444;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.book-details-delete-button:hover {
+  background-color: #ff4444;
+  color: white;
+}
+
+.cover-container {
+  position: relative;
+  width: 100%;
+}
+
+.cover-upload-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.7);
+  padding: 10px;
+  text-align: center;
+  transition: opacity 0.2s ease;
+}
+
+.cover-upload-button {
+  color: white;
+  cursor: pointer;
+  padding: 8px 16px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  display: inline-block;
+  transition: background 0.2s ease;
+}
+
+.cover-upload-button:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.hidden {
+  display: none;
+}
+
+.edit-details-button {
+  padding: 6px 12px;
+  background: #f0f0f0;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.edit-details-button:hover {
+  background: #e0e0e0;
+}
+
+.edit-field {
+  margin-bottom: 16px;
+}
+
+.edit-field label {
+  display: block;
+  margin-bottom: 4px;
+  color: #666;
+  font-weight: 500;
+}
+
+.edit-field input,
+.edit-field textarea {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.edit-field textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.edit-title-input {
+  font-size: 24px;
+  font-weight: 600;
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 16px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.edit-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+
+.save-details-button,
+.cancel-edit-button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.save-details-button {
+  background: #4CAF50;
+  color: white;
+}
+
+.save-details-button:hover {
+  background: #43a047;
+}
+
+.cancel-edit-button {
+  background: #f44336;
+  color: white;
+}
+
+.cancel-edit-button:hover {
+  background: #d32f2f;
+}
+
+.details-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+/* Disabled state styles */
+.edit-field input:disabled,
+.edit-field textarea:disabled,
+.save-details-button:disabled,
+.cancel-edit-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
