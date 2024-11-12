@@ -2,11 +2,8 @@ import React, { useState, useEffect } from 'react';
 import '../styles/VerticalNavbar.css';
 
 const VerticalNavbar = ({ shelves, selectedShelf, onShelfSelect, onAddShelfClick }) => {
-  console.log('VerticalNavbar - Current shelves:', shelves);
-  console.log('VerticalNavbar - Selected shelf:', selectedShelf);
 
   const handleShelfClick = (shelf) => {
-    console.log('Shelf clicked:', shelf);
     onShelfSelect(shelf.shelf_id || shelf.id);
   };
 

@@ -1,5 +1,6 @@
 const db = require("../config/db");
 const path = require('path');
+const fs = require('fs');
 
 //Google Gemini Configurations and Libraries
 const {
@@ -77,8 +78,7 @@ class Book {
       `;
 
       const genresJson = JSON.stringify(this.genres || []);
-      console.log('Save method - Genres JSON:', genresJson);
-
+      
       const values = [
         this.shelf_id,
         this.title,
@@ -265,44 +265,74 @@ class Book {
     }
   }
 
-  static async generateContentFromImage(fileUri, mimeType) {
+  static async generateContentFromImage(fileUri, mimeType, originalFilePath) {
     try {
-      const schema = {
-        description: "List of detected book titles",
-        type: "array",
-        items: {
-          type: "object",
-          properties: {
-            bookTitle: {
-              type: "string",
-              description: "Title of the book detected in the image",
-              nullable: false,
-            },
-          },
-          required: ["bookTitle"],
-        },
-      };
+      console.log('Reading file for content generation:', originalFilePath);
+
+      const imageData = fs.readFileSync(originalFilePath);
+      const base64Image = imageData.toString('base64');
+
+      console.log('Image data loaded, initializing model');
 
       const model = genAI.getGenerativeModel({
         model: "gemini-1.5-flash",
         generationConfig: {
-          responseMimeType: "application/json",
-          responseSchema: schema,
-        },
+          temperature: 0.4,
+          topK: 32,
+          topP: 1,
+          maxOutputTokens: 4096,
+        }
       });
 
-      const result = await model.generateContent([
-        "Analyze this image and tell me the titles of the books you see. List only the titles, not the authors. The titles should follow standard title capitalization rules.",
-        {
-          fileData: {
-            fileUri,
-            mimeType,
-          },
-        },
-      ]);
+      console.log('Model initialized, preparing prompt');
 
-      console.log("Generated Content from Google Gemini:", result.response.text());
-      return JSON.parse(result.response.text());
+      const parts = [
+        {
+          text: "Analyze this image and list the book titles you can see. Return only a JSON array where each object has a 'bookTitle' property. Do not include any markdown formatting or code block markers."
+        },
+        {
+          inlineData: {
+            mimeType: mimeType,
+            data: base64Image
+          }
+        }
+      ];
+
+      console.log('Sending request to model');
+      const result = await model.generateContent(parts);
+      const responseText = result.response.text();
+      console.log('Received response:', responseText);
+
+      // Clean the response text by removing markdown code block markers
+      const cleanedText = responseText
+        .replace(/```json/g, '')
+        .replace(/```/g, '')
+        .trim();
+
+      try {
+        const bookTitles = JSON.parse(cleanedText);
+        console.log('Parsed book titles:', bookTitles);
+        return Array.isArray(bookTitles) ? bookTitles : [{ bookTitle: cleanedText }];
+      } catch (error) {
+        console.log('JSON parsing failed, extracting titles manually:', error);
+
+        // Extract title objects from the response
+        const titleMatches = cleanedText.match(/"bookTitle":\s*"([^"]+)"/g);
+        if (titleMatches) {
+          return titleMatches.map(match => {
+            const title = match.match(/"bookTitle":\s*"([^"]+)"/)[1];
+            return { bookTitle: title };
+          });
+        }
+
+        // If no title objects found, fall back to line-by-line processing
+        return cleanedText
+          .split('\n')
+          .filter(line => line.trim())
+          .filter(line => !line.match(/^[\[\]{},]$/)) // Remove lines that are just brackets or commas
+          .map(line => ({ bookTitle: line.trim() }));
+      }
+
     } catch (error) {
       console.error("Error generating content from image:", error);
       throw error;

@@ -18,16 +18,20 @@ exports.detectBooks = async (req, res) => {
   const mimeType = req.file.mimetype;
 
   try {
-    console.log('File path:', filePath);
-    console.log('MIME type:', mimeType);
+    console.log('File details:', {
+      path: filePath,
+      mimeType: mimeType,
+      originalName: req.file.originalname
+    });
 
-    // Upload the image file to Google Gemini
-    const uploadResult = await Book.uploadToGemini(filePath, mimeType, req.file.originalname);
-    console.log('File uploaded to Gemini');
+    // Generate content directly from the uploaded file
+    const bookTitles = await Book.generateContentFromImage(
+      null,  // We're not using the fileUri anymore
+      mimeType,
+      filePath
+    );
 
-    // Generate content (detect book titles) from the uploaded image
-    const bookTitles = await Book.generateContentFromImage(uploadResult.file.uri, mimeType);
-    console.log('Detected book titles from Gemini:', bookTitles);
+    console.log('Detected book titles:', bookTitles);
 
     res.status(200).json({
       message: "Books detected successfully",
@@ -65,16 +69,12 @@ exports.fetchOpenLibraryMetadata = async (req, res) => {
 
           if (response.data.items && response.data.items.length > 0) {
             const book = response.data.items[0].volumeInfo;
-            console.log('Categories received:', book.categories);
 
-            // Process categories
-            const genres = book.categories ?
-              book.categories
-                .join(',') // Join all category strings
-                .split(/,|\//) // Split on commas and forward slashes
-                .map(category => category.trim()) // Trim whitespace
-                .filter(category => category.length > 0) // Remove empty strings
-              : [];
+            // Log the raw categories data for debugging
+            console.log('Raw categories for', bookTitle, ':', book.categories);
+
+            // Simply use the categories array directly
+            const categories = book.categories || [];
 
             // Enhanced cover image handling
             let coverUrl = null;
@@ -103,15 +103,14 @@ exports.fetchOpenLibraryMetadata = async (req, res) => {
                 "N/A" : "N/A",
               cover: coverUrl,
               description: book.description || "No description available",
-              genres: genres, // Add processed genres
+              genres: categories,  // Use the raw categories array
               rating: null,
               page_count: book.pageCount || null,
               language: book.language || "N/A",
               publisher: book.publisher || "N/A",
               user_notes: "",
               shelf_id: null,
-              shelf_location: null,
-              raw_categories: book.categories || [] // Keep original categories if needed
+              shelf_location: null
             };
           } else {
             return {
@@ -483,6 +482,8 @@ const ensureUploadDirs = async () => {
 
 exports.uploadCover = async (req, res, next) => {
   try {
+    await ensureUploadDirs();
+
     if (!req.file) {
       return res.status(400).json({
         message: 'No file uploaded.'
@@ -491,17 +492,13 @@ exports.uploadCover = async (req, res, next) => {
 
     const bookId = req.params.id;
 
-    // Create the server URL (for development)
-    const serverUrl = process.env.NODE_ENV === 'production'
-      ? process.env.SERVER_URL
-      : 'http://localhost:5000';
+    // Get the absolute path for storage
+    const coverPath = req.file.path;
+    // Create a URL-friendly relative path for serving
+    const coverUrl = `/uploads/covers/${req.file.filename}`;
 
-    // Create both storage path and public URL
-    const relativePath = `/uploads/covers/${req.file.filename}`;
-    const fullUrl = `${serverUrl}${relativePath}`;
-
-    console.log('File saved at:', req.file.path);
-    console.log('Public URL will be:', fullUrl);
+    console.log('File uploaded to:', coverPath);
+    console.log('Cover URL will be:', coverUrl);
 
     const sql = `
       UPDATE book 
@@ -509,21 +506,23 @@ exports.uploadCover = async (req, res, next) => {
       WHERE book_id = ?
     `;
 
-    const [result] = await db.execute(sql, [relativePath, bookId]);
+    const [result] = await db.execute(sql, [coverUrl, bookId]);
 
     if (result.affectedRows === 0) {
-      await fs.unlink(req.file.path).catch(console.error);
+      // Clean up the uploaded file if book not found
+      await fs.unlink(coverPath).catch(console.error);
       return res.status(404).json({ message: 'Book not found' });
     }
 
     res.status(200).json({
       message: 'Cover uploaded successfully',
-      coverUrl: fullUrl
+      coverUrl: coverUrl
     });
 
   } catch (error) {
     console.error('Error uploading cover:', error);
     if (req.file) {
+      // Clean up the uploaded file on error
       await fs.unlink(req.file.path).catch(console.error);
     }
     next(error);

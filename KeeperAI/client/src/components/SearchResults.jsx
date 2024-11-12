@@ -1,5 +1,6 @@
 import React from 'react';
 import { Search } from 'lucide-react';
+import { getImageUrl, handleImageError } from '../utils/imageUtils.js';
 import '../styles/SearchResults.css';
 
 const SearchResults = ({ results, onResultClick, isLoading }) => {
@@ -31,10 +32,7 @@ const SearchResults = ({ results, onResultClick, isLoading }) => {
                       src={getImageUrl(book.cover, book.title)}
                       alt={`Cover of ${book.title}`}
                       className="book-cover-mini"
-                      onError={(e) => {
-                        e.target.onerror = null;
-                        e.target.src = getPlaceholderUrl(book.title, 200, 300);
-                      }}
+                      onError={(e) => handleImageError(e, book.title)}
                     />
                     <div className="book-info-mini">
                       <p className="book-title-mini">

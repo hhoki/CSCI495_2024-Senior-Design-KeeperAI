@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { X, Trash2, RefreshCw, Search } from 'lucide-react';
 import api from '../axiosConfig';
+import { getImageUrl, handleImageError } from '../utils/imageUtils.js';
 import '../styles/AddBooksModal.css';
 
 const BookPreview = ({ book, onRemove, onTitleChange, onUpdate }) => {
@@ -25,10 +26,7 @@ const BookPreview = ({ book, onRemove, onTitleChange, onUpdate }) => {
           src={getImageUrl(book.cover, book.title)}
           alt={`Cover of ${book.title}`}
           className="book-preview-cover"
-          onError={(e) => {
-            e.target.onerror = null;
-            e.target.src = getPlaceholderUrl(book.title, 200, 300);
-          }}
+          onError={(e) => handleImageError(e, book.title)}
         />
         <div className="book-preview-details">
           
@@ -94,9 +92,58 @@ const AddBooksModal = ({ onClose, shelfId, onBooksAdded }) => {
     setActiveTab(tab);
   };
 
+  const handleManualSearch = async (e) => {
+    e.preventDefault();
+    if (!manualTitle.trim() || isSearching) return;
+
+    setIsSearching(true);
+    try {
+      const response = await api.post('/book/metadata', {
+        bookTitles: [manualTitle.trim()]
+      });
+
+      if (response.data && response.data.books && response.data.books.length > 0) {
+        // Add new book to manualBooks array
+        setManualBooks(prev => [...prev, ...response.data.books]);
+        // Clear the input
+        setManualTitle('');
+      } else {
+        // If no book found, add a placeholder entry
+        setManualBooks(prev => [...prev, {
+          title: manualTitle.trim(),
+          author: 'Unknown',
+          published_date: 'N/A',
+          isbn: 'N/A',
+          cover: null,
+          description: 'No information available',
+          genres: []
+        }]);
+      }
+    } catch (error) {
+      console.error('Error searching for book:', error);
+      alert('Failed to search for book. Please try again.');
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
   const handleFileChange = (e) => {
-    setFile(e.target.files[0]);
-    setDetectedBooks([]);
+    const selectedFile = e.target.files[0];
+
+    if (selectedFile) {
+      if (!selectedFile.type.startsWith('image/')) {
+        alert('Please select an image file');
+        return;
+      }
+
+      if (selectedFile.size > 5 * 1024 * 1024) {
+        alert('File size should be less than 5MB');
+        return;
+      }
+
+      setFile(selectedFile);
+      setDetectedBooks([]);
+    }
   };
 
   const handleSubmitImage = async (e) => {
@@ -109,59 +156,20 @@ const AddBooksModal = ({ onClose, shelfId, onBooksAdded }) => {
     formData.append('model', selectedModel);
 
     try {
-      console.log('Submitting image:', file);
-      console.log('Selected model:', selectedModel);
-
-      // First, detect books
-      const detectResponse = await axios.post('/api/book/detect', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-
-      console.log('Detection response:', detectResponse.data);
+      const detectResponse = await api.post('/book/detect', formData);
 
       if (detectResponse.data.bookTitles) {
-        // Then fetch metadata for detected books
-        const metadataResponse = await axios.post('/api/book/metadata', {
+        const metadataResponse = await api.post('/book/metadata', {
           bookTitles: detectResponse.data.bookTitles.map(book => book.bookTitle)
         });
 
-        console.log('Metadata response:', metadataResponse.data);
         setDetectedBooks(metadataResponse.data.books);
-      } else {
-        console.error('No book titles in response:', detectResponse.data);
       }
     } catch (error) {
-      console.error('Error details:', {
-        message: error.message,
-        response: error.response?.data,
-        status: error.response?.status
-      });
+      console.error('Error processing image:', error);
       alert('Failed to process image. Please try again.');
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const handleManualSearch = async (e) => {
-    e.preventDefault();
-    if (!manualTitle.trim()) return;
-
-    setIsSearching(true);
-    try {
-      const response = await api.post('/book/metadata', {
-        bookTitles: [manualTitle]
-      });
-
-      if (response.data.books && response.data.books.length > 0) {
-        setManualBooks(prevBooks => [...prevBooks, ...response.data.books]);
-        setManualTitle('');
-      }
-    } catch (error) {
-      console.error('Error searching for book:', error);
-    } finally {
-      setIsSearching(false);
     }
   };
 
@@ -180,21 +188,22 @@ const AddBooksModal = ({ onClose, shelfId, onBooksAdded }) => {
     const book = currentBooks[index];
 
     try {
-      const response = api.post('/book/metadata', {
+      const response = await api.post('/book/metadata', {
         bookTitles: [book.title]
       });
 
-      if (response.data.books && response.data.books.length > 0) {
+      if (response.data && response.data.books && response.data.books.length > 0) {
         const updatedMetadata = response.data.books[0];
         const newBooks = [...currentBooks];
         newBooks[index] = {
           ...updatedMetadata,
-          title: book.title
+          title: book.title  // Preserve the manual title
         };
         setBooks(newBooks);
       }
     } catch (error) {
       console.error('Error updating book metadata:', error);
+      alert('Failed to update book information. Please try again.');
     }
   };
 
@@ -226,13 +235,13 @@ const AddBooksModal = ({ onClose, shelfId, onBooksAdded }) => {
       onClose();
     } catch (error) {
       console.error('Error adding books:', error);
+      alert('Failed to add books. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
   };
 
   const currentBooks = activeTab === 'image' ? detectedBooks : manualBooks;
-
   return (
     <div className="modal-backdrop" onClick={onClose}>
       <div className="add-books-modal-content" onClick={e => e.stopPropagation()}>

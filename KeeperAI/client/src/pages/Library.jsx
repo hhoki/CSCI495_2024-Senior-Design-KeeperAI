@@ -245,8 +245,7 @@ const Library = () => {
       console.log('Selecting shelf:', shelfId); // Debug log
 
       const numericShelfId = typeof shelfId === 'string' ? parseInt(shelfId, 10) : shelfId;
-      console.log('Numeric shelf ID:', numericShelfId); // Debug log
-
+      
       const targetShelf = shelves.find(s =>
         s.shelf_id === numericShelfId ||
         s.id === numericShelfId
@@ -257,13 +256,10 @@ const Library = () => {
       if (targetShelf) {
         setSelectedShelf(targetShelf);
 
-        // Make sure we're using the correct ID format
         const fetchId = targetShelf.shelf_id || targetShelf.id;
-        console.log('Fetching books for shelf ID:', fetchId); // Debug log
 
         try {
           const response = await api.get(`/book/shelf/${fetchId}`);
-          console.log('Books response:', response.data); // Debug log
           setBooks(response.data.books || []);
         } catch (error) {
           console.error('Error fetching books:', error);
