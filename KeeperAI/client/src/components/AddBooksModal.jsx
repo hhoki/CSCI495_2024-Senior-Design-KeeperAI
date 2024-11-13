@@ -148,25 +148,51 @@ const AddBooksModal = ({ onClose, shelfId, onBooksAdded }) => {
 
   const handleSubmitImage = async (e) => {
     e.preventDefault();
-    if (!file) return;
+    if (!file) {
+      console.log('No file selected');
+      return;
+    }
 
     setIsLoading(true);
     const formData = new FormData();
+
+    // Make sure we're using the correct field name that matches the backend
     formData.append('bookImage', file);
-    formData.append('model', selectedModel);
+
+    // Log the FormData contents for debugging
+    console.log('Submitting file:', {
+      name: file.name,
+      type: file.type,
+      size: file.size
+    });
 
     try {
-      const detectResponse = await api.post('/book/detect', formData);
+      // First, detect books from the image
+      const detectResponse = await api.post('/book/detect', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
 
-      if (detectResponse.data.bookTitles) {
+      console.log('Detection response:', detectResponse.data);
+
+      if (detectResponse.data.bookTitles && detectResponse.data.bookTitles.length > 0) {
+        // Then fetch metadata for the detected books
         const metadataResponse = await api.post('/book/metadata', {
           bookTitles: detectResponse.data.bookTitles.map(book => book.bookTitle)
         });
 
+        console.log('Metadata response:', metadataResponse.data);
         setDetectedBooks(metadataResponse.data.books);
+      } else {
+        alert('No books were detected in the image. Please try another image.');
       }
     } catch (error) {
       console.error('Error processing image:', error);
+      console.error('Error details:', {
+        message: error.message,
+        response: error.response?.data
+      });
       alert('Failed to process image. Please try again.');
     } finally {
       setIsLoading(false);

@@ -23,6 +23,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Image upload handling
 app.use('/uploads', express.static(path.join(__dirname, 'uploads'), {
   setHeaders: (res, filePath) => {
+    // Set proper content type for images
     if (filePath.endsWith('.jpg') || filePath.endsWith('.jpeg')) {
       res.setHeader('Content-Type', 'image/jpeg');
     } else if (filePath.endsWith('.png')) {
@@ -30,6 +31,8 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads'), {
     } else if (filePath.endsWith('.gif')) {
       res.setHeader('Content-Type', 'image/gif');
     }
+    // Add cache control for better performance
+    res.setHeader('Cache-Control', 'public, max-age=31536000');
   }
 }));
 

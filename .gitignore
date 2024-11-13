@@ -160,7 +160,6 @@ yarn-error.log*
 Thumbs.db
 
 # Ignore uploads directory but keep the folder
-uploads/*
-!uploads/.gitkeep
-uploads/covers/*
-!uploads/covers/.gitkeep
+# Upload directories
+server/uploads/
+server/uploads/covers/

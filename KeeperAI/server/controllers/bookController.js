@@ -480,10 +480,8 @@ const ensureUploadDirs = async () => {
   }
 };
 
-exports.uploadCover = async (req, res, next) => {
+exports.uploadCover = async (req, res) => {
   try {
-    await ensureUploadDirs();
-
     if (!req.file) {
       return res.status(400).json({
         message: 'No file uploaded.'
@@ -492,13 +490,19 @@ exports.uploadCover = async (req, res, next) => {
 
     const bookId = req.params.id;
 
-    // Get the absolute path for storage
-    const coverPath = req.file.path;
-    // Create a URL-friendly relative path for serving
-    const coverUrl = `/uploads/covers/${req.file.filename}`;
+    // Create the relative path that will be stored in the database
+    const relativePath = `/uploads/covers/${req.file.filename}`;
 
-    console.log('File uploaded to:', coverPath);
-    console.log('Cover URL will be:', coverUrl);
+    // Create both storage path and public URL
+    const serverUrl = process.env.NODE_ENV === 'production'
+      ? process.env.SERVER_URL
+      : 'http://localhost:5000';
+
+    const fullUrl = `${serverUrl}${relativePath}`;
+
+    console.log('File saved at:', req.file.path);
+    console.log('Public URL will be:', fullUrl);
+    console.log('Relative path stored in DB:', relativePath);
 
     const sql = `
       UPDATE book 
@@ -506,23 +510,23 @@ exports.uploadCover = async (req, res, next) => {
       WHERE book_id = ?
     `;
 
-    const [result] = await db.execute(sql, [coverUrl, bookId]);
+    const [result] = await db.execute(sql, [relativePath, bookId]);
 
     if (result.affectedRows === 0) {
       // Clean up the uploaded file if book not found
-      await fs.unlink(coverPath).catch(console.error);
+      await fs.unlink(req.file.path).catch(console.error);
       return res.status(404).json({ message: 'Book not found' });
     }
 
     res.status(200).json({
       message: 'Cover uploaded successfully',
-      coverUrl: coverUrl
+      coverUrl: relativePath // Send back the relative path
     });
 
   } catch (error) {
     console.error('Error uploading cover:', error);
+    // Clean up the uploaded file in case of error
     if (req.file) {
-      // Clean up the uploaded file on error
       await fs.unlink(req.file.path).catch(console.error);
     }
     next(error);
