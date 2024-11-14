@@ -196,21 +196,8 @@ exports.updateBookById = async (req, res, next) => {
 
     console.log('Updating book:', { bookId, updates });
 
-    // Process updates to handle empty strings and type conversion
-    const processedUpdates = {};
-    Object.entries(updates).forEach(([key, value]) => {
-      if (value === '') {
-        processedUpdates[key] = null;
-      } else if (key === 'page_count' && value !== null) {
-        // Convert to number or null if not a valid number
-        const num = parseInt(value);
-        processedUpdates[key] = isNaN(num) ? null : num;
-      } else {
-        processedUpdates[key] = value;
-      }
-    });
-
     const allowedFields = [
+      'shelf_id',  // Add this to allowed fields
       'title',
       'author',
       'description',
@@ -228,7 +215,7 @@ exports.updateBookById = async (req, res, next) => {
     const updateFields = [];
     const values = [];
 
-    Object.entries(processedUpdates).forEach(([key, value]) => {
+    Object.entries(updates).forEach(([key, value]) => {
       if (allowedFields.includes(key)) {
         updateFields.push(`${key} = ?`);
         values.push(value);
@@ -239,7 +226,7 @@ exports.updateBookById = async (req, res, next) => {
       return res.status(400).json({ message: 'No valid update fields provided' });
     }
 
-    values.push(bookId);
+    values.push(bookId);  // Add bookId for WHERE clause
 
     const sql = `
       UPDATE book 
@@ -269,9 +256,6 @@ exports.updateBookById = async (req, res, next) => {
 
   } catch (error) {
     console.error('Error in updateBookById:', error);
-    console.error('Error details:', error);
-    console.error('Request URL:', req.originalUrl);
-    console.error('Request method:', req.method);
     next(error);
   }
 };

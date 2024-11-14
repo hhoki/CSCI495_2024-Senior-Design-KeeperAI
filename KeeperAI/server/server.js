@@ -40,6 +40,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads'), {
 // Book management routes
 app.use("/book", require("./routes/bookRoutes"));
 app.use("/shelf", require("./routes/shelfRoutes"));
+app.use("/recommendations", require("./routes/recommendationsRoutes"));
 
 // Image and placeholder routes
 app.use('/placeholder', require('./routes/placeholderRoutes'));

@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useLocation, useSearchParams } from 'react-router-dom';
-import axios from 'axios';
 import { MoveHorizontal, Trash2, X } from 'lucide-react';
 import VerticalNavbar from '../components/VerticalNavbar';
 import ShelfNavbar from '../components/ShelfNavbar';
@@ -8,77 +7,9 @@ import BookCard from '../components/BookCard';
 import BookDetailsModal from '../components/BookDetailsModal';
 import AddShelfModal from '../components/AddShelfModal';
 import DeleteConfirmationModal from '../components/DeleteConfirmationModal';
+import MoveToShelfModal from '../components/MoveToShelfModal';
 import api from '../axiosConfig';
 import './Library.css';
-
-// Move To Shelf Modal Component
-const MoveToShelfModal = ({ isOpen, onClose, shelves, selectedShelf, onMove, selectedBooks }) => {
-  const [targetShelf, setTargetShelf] = useState(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  // Filter out current shelf and get actual book counts
-  const availableShelves = shelves
-    .filter(shelf => shelf.id !== selectedShelf?.id)
-    .map(shelf => ({
-      ...shelf,
-      // Ensure we handle both book_count and books array cases
-      bookCount: shelf.book_count || shelf.books?.length || 0
-    }));
-
-  const handleMove = async (shelf) => {
-    if (!shelf) return;
-    setIsSubmitting(true);
-    try {
-      await onMove(shelf);
-    } catch (error) {
-      console.error('Error moving books:', error);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  if (!isOpen) return null;
-
-  return (
-    <div className="modal-backdrop" onClick={onClose}>
-      <div className="modal-content move-to-shelf-modal" onClick={e => e.stopPropagation()}>
-        <h2>Move to Shelf</h2>
-        <div className="shelf-list">
-          {availableShelves.map(shelf => (
-            <div
-              key={shelf.id}
-              className={`shelf-option ${targetShelf?.id === shelf.id ? 'selected' : ''}`}
-              onClick={() => setTargetShelf(shelf)}
-            >
-              <div className="shelf-option-content">
-                <span className="shelf-name">{shelf.name || shelf.shelf_name}</span>
-                <span className="book-count">
-                  {shelf.bookCount} {shelf.bookCount === 1 ? 'book' : 'books'}
-                </span>
-              </div>
-            </div>
-          ))}
-        </div>
-        <div className="form-actions">
-          <button
-            className="batch-action-button move"
-            onClick={() => handleMove(targetShelf)}
-            disabled={!targetShelf || isSubmitting}
-          >
-            {isSubmitting ? 'Moving...' : `Move ${selectedBooks.length} ${selectedBooks.length === 1 ? 'book' : 'books'}`}
-          </button>
-          <button
-            className="batch-action-button cancel"
-            onClick={onClose}
-            disabled={isSubmitting}
-          >
-            Cancel
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-};
 
 const Library = () => {
   // State Management
@@ -100,6 +31,9 @@ const Library = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [searchParams] = useSearchParams();
+  const location = useLocation();
+
+  
 
   // Selection Handlers
   const toggleBookSelection = (bookId) => {
@@ -123,19 +57,17 @@ const Library = () => {
     try {
       setIsSubmitting(true);
 
-      // Log the operation
       console.log('Moving books to shelf:', targetShelf);
       console.log('Selected books:', Array.from(selectedBooks));
 
       // Update books in database
       const updatePromises = Array.from(selectedBooks).map(bookId => {
-        console.log(`Updating book ${bookId} to shelf ${targetShelf.id}`);
+        console.log(`Updating book ${bookId} to shelf ${targetShelf.shelf_id}`);
         return api.patch(`/book/${bookId}`, {
-          shelf_id: targetShelf.id || targetShelf.shelf_id // Handle both id formats
+          shelf_id: targetShelf.shelf_id // Always use shelf_id
         });
       });
 
-      // Wait for all updates to complete
       await Promise.all(updatePromises);
 
       // Remove moved books from current view
@@ -146,13 +78,13 @@ const Library = () => {
       // Update shelves state
       setShelves(prevShelves =>
         prevShelves.map(shelf => {
-          if (shelf.id === targetShelf.id || shelf.shelf_id === targetShelf.id) {
+          if (shelf.shelf_id === targetShelf.shelf_id) {
             return {
               ...shelf,
               book_count: (shelf.book_count || 0) + selectedBooks.size
             };
           }
-          if (shelf.id === selectedShelf.id || shelf.shelf_id === selectedShelf.id) {
+          if (shelf.shelf_id === selectedShelf.shelf_id) {
             return {
               ...shelf,
               book_count: Math.max(0, (shelf.book_count || 0) - selectedBooks.size)
@@ -162,16 +94,13 @@ const Library = () => {
         })
       );
 
-      // Clear selection and close modal
       setSelectedBooks(new Set());
       setShowMoveModal(false);
 
     } catch (error) {
       console.error('Error moving books:', error);
-
-      // Refresh current shelf to ensure UI is in sync
       if (selectedShelf) {
-        const response = await api.get(`/book/shelf/${selectedShelf.id}`);
+        const response = await api.get(`/book/shelf/${selectedShelf.shelf_id}`);
         setBooks(response.data.books || []);
       }
     } finally {
@@ -193,6 +122,45 @@ const Library = () => {
       console.error('Error refreshing books after deletion:', error);
     }
   };
+
+  const handleAddRecommendation = async (targetShelf) => {
+    try {
+      const recommendedBook = location.state.addBook;
+      const bookData = {
+        title: recommendedBook.title,
+        author: recommendedBook.author,
+        description: recommendedBook.description,
+        published_date: recommendedBook.published_date,
+        isbn: recommendedBook.isbn,
+        cover: recommendedBook.cover,
+        genres: recommendedBook.genres,
+        shelf_id: targetShelf.shelf_id || targetShelf.id
+      };
+
+      await api.post('/book/batch', [bookData]);
+
+      // Refresh the shelf if we're on it
+      if (selectedShelf?.shelf_id === targetShelf.shelf_id) {
+        const response = await api.get(`/book/shelf/${targetShelf.shelf_id}`);
+        setBooks(response.data.books || []);
+      }
+
+      // Clear the recommendation state
+      navigate(location.pathname, { replace: true, state: {} });
+      setShowMoveModal(false);
+
+    } catch (error) {
+      console.error('Error adding recommended book:', error);
+    }
+  };
+
+  // Also update useEffect to handle recommendations
+  useEffect(() => {
+    // Check for recommended book in location state
+    if (location.state?.addBook) {
+      setShowMoveModal(true);
+    }
+  }, [location.state]);
 
   const handleBatchDelete = async () => {
     try {
@@ -427,7 +395,6 @@ const Library = () => {
             return {
               ...shelf,
               book_count: booksResponse.data.books?.length || 0,
-              // Keep both formats for compatibility
               books: booksResponse.data.books || []
             };
           } catch (error) {
@@ -440,6 +407,36 @@ const Library = () => {
           }
         }));
         setShelves(shelvesWithCounts);
+
+        // Get shelfId from URL parameters
+        const shelfId = searchParams.get('shelfId');
+        const bookId = searchParams.get('bookId');
+
+        // If there's a shelfId in the URL, select that shelf
+        if (shelfId) {
+          const targetShelf = shelvesWithCounts.find(s =>
+            s.shelf_id === parseInt(shelfId) || s.id === parseInt(shelfId)
+          );
+
+          if (targetShelf) {
+            try {
+              const booksResponse = await api.get(`/book/shelf/${shelfId}`);
+              setBooks(booksResponse.data.books || []);
+              setSelectedShelf(targetShelf);
+
+              // If there's a specific book to highlight
+              if (bookId) {
+                const book = booksResponse.data.books?.find(b => b.book_id === parseInt(bookId));
+                if (book) {
+                  setSelectedBook(book);
+                }
+              }
+            } catch (error) {
+              console.error('Error fetching shelf books:', error);
+              setBooks([]);
+            }
+          }
+        }
       } catch (error) {
         console.error('Error initializing library:', error);
         setError(`Failed to load library. ${error.response?.data?.message || error.message}`);
@@ -449,7 +446,7 @@ const Library = () => {
     };
 
     initializeLibrary();
-  }, []);
+  }, [searchParams]);
 
   if (isInitialLoading) {
     return (
@@ -569,11 +566,18 @@ const Library = () => {
 
       <MoveToShelfModal
         isOpen={showMoveModal}
-        onClose={() => setShowMoveModal(false)}
+        onClose={() => {
+          setShowMoveModal(false);
+          // If it's a recommendation being added
+          if (location.state?.addBook) {
+            setSelectedBook(null);
+          }
+        }}
         shelves={shelves}
         selectedShelf={selectedShelf}
-        onMove={handleBatchMove}
-        selectedBooks={Array.from(selectedBooks)}
+        onMove={location.state?.addBook ? handleAddRecommendation : handleBatchMove}
+        selectedBooks={selectedBooks}
+        singleBook={location.state?.addBook} // Pass the recommended book if it exists
       />
 
       <DeleteConfirmationModal

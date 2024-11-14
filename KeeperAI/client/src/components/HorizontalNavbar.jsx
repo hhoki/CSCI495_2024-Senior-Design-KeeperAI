@@ -1,8 +1,7 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Search, User, Menu, UsersRound } from 'lucide-react'; // Add these imports
+import { Search, UsersRound, Menu } from 'lucide-react';
 import SearchResults from './SearchResults';
-import axios from 'axios';
 import Tooltip from './Tooltip';
 import '../styles/HorizontalNavbar.css';
 import api from '../axiosConfig';
@@ -19,6 +18,7 @@ const HorizontalNavbar = () => {
   const performSearch = useCallback(async (query) => {
     if (!query.trim()) {
       setSearchResults([]);
+      setShowResults(false);
       return;
     }
 
@@ -26,6 +26,7 @@ const HorizontalNavbar = () => {
       setIsSearching(true);
       const response = await api.get(`/book/search?query=${encodeURIComponent(query)}`);
       setSearchResults(response.data.results);
+      setShowResults(true);
     } catch (error) {
       console.error('Error searching:', error);
       setSearchResults([]);
@@ -51,22 +52,38 @@ const HorizontalNavbar = () => {
     // Set new timeout for search
     searchTimeoutRef.current = setTimeout(() => {
       performSearch(query);
-    }, 300); // 300ms delay
+    }, 300);
   };
 
-  const handleResultClick = (book, shelfId) => {
-    navigate(`/library?shelfId=${shelfId}`);
+  // Clear search and close results
+  const handleCloseSearch = () => {
     setSearchQuery('');
     setShowResults(false);
     setSearchResults([]);
   };
 
-  // Clear search on unmount
-  React.useEffect(() => {
+  // Cleanup on unmount
+  useEffect(() => {
     return () => {
       if (searchTimeoutRef.current) {
         clearTimeout(searchTimeoutRef.current);
       }
+    };
+  }, []);
+
+  // Handle clicks outside search results
+  const searchContainerRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (searchContainerRef.current && !searchContainerRef.current.contains(event.target)) {
+        setShowResults(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
 
@@ -80,7 +97,7 @@ const HorizontalNavbar = () => {
         </Tooltip>
       </div>
 
-      <div className="keeper-nav-center">
+      <div className="keeper-nav-center" ref={searchContainerRef}>
         <div className="keeper-search-bar">
           <Search className="keeper-search-icon" size={16} color="#ffffff" />
           <input
@@ -99,7 +116,7 @@ const HorizontalNavbar = () => {
         {showResults && (
           <SearchResults
             results={searchResults}
-            onResultClick={handleResultClick}
+            onClose={handleCloseSearch}
             isLoading={isSearching}
           />
         )}

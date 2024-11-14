@@ -78,7 +78,7 @@ class Book {
       `;
 
       const genresJson = JSON.stringify(this.genres || []);
-      
+
       const values = [
         this.shelf_id,
         this.title,
@@ -172,6 +172,22 @@ class Book {
       return true;
     } catch (error) {
       console.error('Error updating book:', error);
+      throw error;
+    }
+  }
+
+  async updateReadingStatus(status) {
+    try {
+      const sql = `
+      UPDATE book
+      SET reading_status = ?, last_updated = CURRENT_TIMESTAMP
+      WHERE book_id = ?
+    `;
+
+      const [result] = await db.execute(sql, [status, this.book_id]);
+      return result.affectedRows > 0;
+    } catch (error) {
+      console.error('Error updating reading status:', error);
       throw error;
     }
   }

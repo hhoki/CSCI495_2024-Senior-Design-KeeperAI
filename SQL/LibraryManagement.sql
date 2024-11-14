@@ -97,6 +97,7 @@ CREATE TABLE `book` (
   `genres` JSON DEFAULT NULL,
   `publisher` VARCHAR(255) NULL DEFAULT NULL,
   `page_count` INT NULL DEFAULT NULL,
+  'last_updated' TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`book_id`),
   KEY `shelf_id` (`shelf_id`),
   CONSTRAINT `shelf_id` FOREIGN KEY (`shelf_id`) REFERENCES `shelf` (`shelf_id`)
