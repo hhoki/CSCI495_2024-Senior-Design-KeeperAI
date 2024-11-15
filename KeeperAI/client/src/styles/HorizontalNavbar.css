@@ -1,0 +1,179 @@
+.keeper-top-navbar {
+  background-color: #efefef;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 10px 15px 0px;
+  height: 75px;
+  width: 100%;
+  box-sizing: border-box;
+  /* Add this to include padding in width calculation */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+}
+
+.keeper-nav-left {
+  display: flex;
+  margin-left: 10px;
+  justify-content: flex-start;
+}
+
+.keeper-nav-center {
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.keeper-nav-right {
+  display: flex;
+  margin-left: auto;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 12px;
+}
+
+.keeper-logo {
+  width: 50px; /* Reduced from 54px */
+  height: 50px; /* Reduced from 54px */
+  padding: 4px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.keeper-logo:hover {
+  background-color: #b0afaf;
+  border-radius: 15px;
+}
+
+.keeper-search-bar {
+  display: flex;
+  align-items: center;
+  padding: 4px 10px; /* Reduced padding */
+  background-color: #3c3c3c;
+  border-radius: 40px;
+  height: 30px;
+  width: 300px; /* Fixed width */
+}
+
+.keeper-search-icon {
+  width: 14px;
+  height: 14px;
+  margin-right: 5px;
+}
+
+.keeper-search-input {
+  background-color: transparent;
+  border: none;
+  color: #ffffff;
+  outline: none;
+  width: 100%;
+  font-size: 14px; /* Slightly smaller font */
+}
+
+.keeper-profile-icon {
+  width: 40px; /* Reduced from 54px */
+  height: 40px;
+  padding: 8px;
+  border-radius: 25px;
+  object-fit: fill;
+  transition: background-color 0.3s ease;
+}
+
+.keeper-profile-icon:hover {
+  border-radius: 30px;
+  background-color: #b0afaf;
+}
+
+.keeper-dropdown {
+  width: 40px; /* Reduced from 54px */
+  height: 40px;
+  margin: 5px;
+  padding: 8px 0px 0px 0px;
+  text-align: center;
+  border-radius: 30px;
+  transition: all 0.3s ease;
+}
+
+.keeper-dropdown:hover {
+  background-color: #b0afaf;
+}
+
+.keeper-dropdown-icon {
+  width: 24px; /* Reduced from 28px */
+  height: 24px;
+  cursor: pointer;
+}
+
+.keeper-dropdown-content a:hover {
+  background-color: #f1f1f1;
+  border-radius: 8px;
+}
+
+.keeper-profile-button,
+.keeper-dropdown-button {
+  width: 50px;
+  height: 50px;
+  padding: 8px;
+  border: none;
+  background: none;
+  border-radius: 25px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.3s ease;
+  color: #333;
+  /* Icon color */
+}
+
+.keeper-profile-button:hover,
+.keeper-dropdown-button:hover {
+  background-color: #b0afaf;
+  border-radius: 30px;
+}
+
+.keeper-dropdown {
+  /* Update this class */
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+/* Keep the dropdown content styles */
+.keeper-dropdown-content {
+  position: absolute;
+  top: 75px;
+  /* Adjusted for new button height */
+  right: 0;
+  background-color: #f9f9f9;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+  z-index: 1050;
+  border-radius: 0px 0px 0px 8px;
+  overflow: hidden;
+}
+
+.keeper-dropdown-content a {
+  color: #333;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+  transition: background-color 0.2s ease;
+}
+
+.keeper-dropdown-content a:hover {
+  background-color: #f1f1f1;
+}
+
+/* Optional: Add focus styles for accessibility */
+.keeper-profile-button:focus,
+.keeper-dropdown-button:focus {
+  outline: none;
+  background-color: #e0e0e0;
+}
+
+/* Optional: Add active styles */
+.keeper-profile-button:active,
+.keeper-dropdown-button:active {
+  background-color: #d0d0d0;
+}

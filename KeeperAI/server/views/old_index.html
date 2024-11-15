@@ -1,0 +1,129 @@
+<!--
+
+-->
+<!DOCTYPE html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="description" content="A brief description">
+        <meta name="keywords" content="HTML, CSS, JavaScript">
+        <meta name="author" content="Diego Arriaga, Ethan Buchanan">
+        
+        <title>KeeperAI</title>
+
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="/css/styles.css">
+        <script src="/js/script.js" defer></script>
+        <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+        
+        
+    </head>
+    <body>
+        
+            <nav class="topnav">
+                <div class="topnav-section topnav-left">
+                    <a class="logo" href="#home">
+                        <img src="/images/KeeperAI [Transparent].png" alt="Profile image" width="54" height="54">
+                    </a>
+                </div>
+                <div class="topnav-section topnav-center">
+                    <div class="search-bar">
+                        <form action="/search" method="get" class="search-form">
+                            <input type="text" name="query" placeholder="Search..." class="search-input">
+                            <button type="submit" class="search-button">
+                                <img src="/images/icons/search.png" alt="Profile image" width="14" height="14">
+                            </button>
+                        </form>
+                    </div>
+                   
+                </div>
+
+                <div class="topnav-section topnav-right">
+                    <a href="#profile">
+                        <img src="https://cdn1.iconfinder.com/data/icons/essentials-pack/96/user_account_profile_avatar_person-512.png" alt="Profile image" width="28" height="28">
+                    </a> 
+
+                    <div class="dropdown">
+                        <button class="dropbtn" id="menuDropdown">
+                            <img src="/images/icons/dropdown logo.png" alt="Profile image" width="28" height="28">
+                          <i class="fa fa-caret-down"></i>
+                        </button>
+                        <div class="dropdown-content">
+                          <a href="#">Library</a>
+                          <a href="#">Reccomendations</a>
+                          <a href="#">Analytics</a>
+                          <a href="#">Contact</a>
+                          <a href="#">Settings</a>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+
+            <div class="layout-container">
+                <div class="side-navbar" id="myNavbar">
+                </div>
+                <div class="content">
+                    <nav class="topnav">
+                        <div class="topnav-section topnav-left">
+                            <button class="addbtn" onclick="showAddBookModal()">+</button>
+                        </div>
+                        <div class="topnav-section topnav-center">
+                            <h1>Shelf Name</h3>
+                        </div>
+                        <div class="topnav-section topnav-right">
+                            <a class="logo" href="#home">
+                                <img src="/images/icons/bag cog.png" alt="Profile image" width="25" height="25">
+                            </a>
+                        </div>
+                    </nav>
+                    <div class="card-grid" id="cardGrid">
+                        <!-- Cards will be dynamically added here -->
+                    </div>
+                </div>
+            
+                <!-- Modal -->
+                <div id="cardModal" class="modal">
+                    <div class="modal-content">
+                        <span class="close" id="closeCardModal">&times;</span>
+                        <h2 id="cardModalTitle"></h2>
+                        <div id="cardModalContent"></div>
+                    </div>
+                </div>
+            
+                <div id="addBookModal" class="add-book-modal">
+                    <div class="add-book-modal-content">
+                        <span class="close" id="closeAddBookModal">&times;</span>
+                        <h2 id="addBookModalTitle"></h2>
+                        <div id="addBookModalContent"></div>
+                    </div>
+                </div>
+
+                <div id="addShelfModal" class="modal">
+                    <div class="add-shelf-modal-content">
+                        <span class="close" id="closeAddShelfModal">&times;</span>
+                        <h2 id="addShelfModalTitle"></h2>
+                        <div id="addShelfModalContent"></div>
+                    </div>
+                </div>
+
+                <div id="addShelfModal" class="modal">
+                    <div class="modal-content">
+                      <span class="close" onclick="closeAddShelfModal()">&times;</span>
+                      <h2>Add New Shelf</h2>
+                      <form id="addShelfForm">
+                        <label for="shelfName">Shelf Name:</label>
+                        <input type="text" id="shelfName" required>
+                        <label for="shelfDescription">Description:</label>
+                        <textarea id="shelfDescription"></textarea>
+                        <button type="submit">Add Shelf</button>
+                      </form>
+                    </div>
+                  </div>
+            </div>
+            
+            
+
+
+
+    </body>
+</html>

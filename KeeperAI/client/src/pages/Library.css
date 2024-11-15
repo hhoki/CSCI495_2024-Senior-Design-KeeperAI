@@ -1,0 +1,298 @@
+    .library-container {
+      display: flex;
+      height: 100vh;
+      width: 100vw;
+      overflow: hidden;
+      position: fixed;
+      top: 0;
+      left: 0;
+    }
+
+     .content-wrapper {
+       flex: 1;
+       margin-left: 250px;
+       /* Match vertical navbar width */
+       margin-top: 75px;
+       /* Match horizontal navbar height */
+       height: calc(100vh - 75px);
+       display: flex;
+       flex-direction: column;
+       position: relative;
+       overflow: hidden;
+     }
+  
+     .content-area {
+       flex: 1;
+       overflow-y: auto;
+       width: 100%;
+       height: 100%;
+       box-sizing: border-box;
+     }
+  
+     .book-grid {
+       display: grid;
+       grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+       gap: 24px;
+       padding: 24px;
+       min-height: min-content;
+       box-sizing: border-box;
+     }
+  
+    /* Selection overlay */
+    .book-card .selection-overlay {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      z-index: 10;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+  
+    .book-card:hover .selection-overlay,
+    .book-card.selected .selection-overlay {
+      opacity: 1;
+    }
+  
+    .selection-checkbox {
+      width: 18px;
+      height: 18px;
+      border-radius: 4px;
+      background: white;
+      border: 2px solid #ddd;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+
+    .book-card-placeholder {
+      width: 200px;
+      height: 300px;
+      border: 3px dashed #2196F3;
+      border-radius: 8px;
+      background-color: rgba(33, 150, 243, 0.1);
+      position: relative;
+      transition: all 0.2s ease;
+      animation: placeholderPulse 1.5s infinite;
+    }
+  
+    .book-card.selected .selection-checkbox {
+      background: #2196F3;
+      border-color: #2196F3;
+    }
+  
+    /* Batch actions bar */
+    .batch-actions-bar {
+      position: fixed;
+      bottom: 0;
+      left: 250px;
+      /* Match the width of your vertical navbar */
+      right: 0;
+      background: white;
+      padding: 16px 24px;
+      box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transform: translateY(100%);
+      transition: transform 0.3s ease;
+      z-index: 100;
+    }
+  
+    .batch-actions-bar.visible {
+      transform: translateY(0);
+    }
+  
+    .selected-count {
+      font-size: 16px;
+      color: #666;
+    }
+  
+    .batch-actions {
+      display: flex;
+      gap: 12px;
+    }
+  
+    .batch-action-button {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+  
+    .batch-action-button.move {
+      background-color: #2196F3;
+      color: white;
+    }
+  
+    .batch-action-button.move:hover {
+      background-color: #1e88e5;
+    }
+  
+    .batch-action-button.delete {
+      background-color: #ff4444;
+      color: white;
+    }
+  
+    .batch-action-button.delete:hover {
+      background-color: #ff2222;
+    }
+  
+    .batch-action-button.cancel {
+      background-color: #e0e0e0;
+      color: #333;
+    }
+  
+    .batch-action-button.cancel:hover {
+      background-color: #d0d0d0;
+    }
+  
+    /* Move to shelf modal */
+    .move-to-shelf-modal {
+      max-width: 400px !important;
+    }
+  
+    .shelf-list {
+      margin: 16px 0;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+  
+        .shelf-option {
+          padding: 12px 16px;
+          border: 1px solid #eee;
+          border-radius: 4px;
+          margin-bottom: 8px;
+          cursor: pointer;
+          transition: all 0.2s ease;
+        }
+    
+        .shelf-option:hover {
+          background-color: #f5f5f5;
+        }
+    
+        .shelf-option.selected {
+          background-color: #e3f2fd;
+          border-color: #2196F3;
+        }
+    
+        .shelf-option-content {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        }
+    
+        .shelf-name {
+          font-weight: 500;
+          color: #333;
+        }
+    
+        .book-count {
+          font-size: 14px;
+          color: #666;
+          background-color: #f0f0f0;
+          padding: 2px 8px;
+          border-radius: 12px;
+        }
+    
+        /* Modal container styles */
+        .move-to-shelf-modal {
+          max-width: 400px !important;
+        }
+    
+        .shelf-list {
+          margin: 16px 0;
+          max-height: 300px;
+          overflow-y: auto;
+        }
+
+        .spinner {
+          width: 16px;
+          height: 16px;
+          border: 2px solid rgba(255, 255, 255, 0.3);
+          border-radius: 50%;
+          border-top-color: #fff;
+          animation: spin 1s linear infinite;
+          margin-right: 8px;
+        }
+    
+        @keyframes spin {
+          to {
+            transform: rotate(360deg);
+          }
+        }
+    
+        .shelf-option {
+          padding: 12px 16px;
+          border: 1px solid #eee;
+          border-radius: 4px;
+          margin-bottom: 8px;
+          cursor: pointer;
+          transition: all 0.2s ease;
+        }
+
+        .shelf-option:hover {
+          background-color: #f5f5f5;
+        }
+
+        .shelf-option.selected {
+          background-color: #e3f2fd;
+          border-color: #2196F3;
+        }
+
+        .shelf-option-content {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        }
+
+        .shelf-name {
+          font-weight: 500;
+          color: #333;
+        }
+
+        .book-count {
+          font-size: 14px;
+          color: #666;
+        }
+        .batch-action-button:disabled {
+          cursor: not-allowed;
+          opacity: 0.7;
+        }
+
+    @keyframes placeholderPulse {
+      0% {
+        border-color: #2196F3;
+        background-color: rgba(33, 150, 243, 0.1);
+      }
+  
+      50% {
+        scale: 1.02;
+        border-color: #64B5F6;
+        background-color: rgba(33, 150, 243, 0.2);
+        transition: all 1s ease-in-out;
+      }
+  
+      100% {
+        border-color: #2196F3;
+        background-color: rgba(33, 150, 243, 0.1);
+      }
+    }
+
+        .book-card.dragging {
+          opacity: 0.5;
+          cursor: grabbing;
+          transform: scale(1.05);
+          box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+    
+        /* Drop target indication */
+        .book-grid.drag-over {
+          background-color: rgba(33, 150, 243, 0.05);
+        }

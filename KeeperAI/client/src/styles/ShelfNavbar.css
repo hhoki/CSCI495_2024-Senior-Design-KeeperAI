@@ -1,0 +1,92 @@
+.shelf-navbar {
+  background-color: #efefef;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+}
+
+.shelf-nav-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.shelf-nav-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.shelf-name {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.shelf-icon {
+  color: #555;
+}
+
+/* Icon Button Style */
+.icon-button {
+  width: 40px;
+  height: 40px;
+  padding: 8px;
+  border: none;
+  background: none;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #555;
+  transition: all 0.2s ease;
+}
+
+.icon-button:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+  color: #333;
+}
+
+.icon-button:active {
+  transform: scale(0.95);
+}
+
+/* Delete button specific style */
+.icon-button.delete {
+  color: #666;
+}
+
+.icon-button.delete:hover {
+  background-color: rgba(244, 67, 54, 0.1);
+  color: #f44336;
+}
+
+/* Tooltip container */
+.tooltip-container {
+  position: relative;
+}
+
+/* Animation for buttons */
+@keyframes iconPulse {
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.1);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+.icon-button:focus {
+  outline: none;
+  animation: iconPulse 0.3s ease;
+}

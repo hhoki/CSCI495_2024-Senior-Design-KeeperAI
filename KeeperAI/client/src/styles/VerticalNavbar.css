@@ -1,0 +1,96 @@
+.side-navbar {
+  width: 250px;
+  background-color: #f0f0f0;
+  height: calc(100vh - 65px);
+  /* Adjusted for top navbar height */
+  position: fixed;
+  top: 65px;
+  /* Match the top navbar height */
+  left: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  transition: width 0.3s ease;
+  z-index: 90;
+}
+
+.shelf-buttons-container {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  padding: 10px 0;
+}
+
+.shelf-item {
+  margin-bottom: 0;
+}
+
+.shelf-button {
+  display: block;
+  width: 100%;
+  padding: 15px;
+  border: none;
+  background-color: transparent;
+  cursor: pointer;
+  text-align: left;
+  font-size: 16px;
+  color: #000000;
+  transition: background-color 0.3s ease;
+  position: relative;
+}
+
+.shelf-button:hover,
+.shelf-button.selected {
+  background-color: #e0e0e0;
+}
+
+.shelf-description {
+  max-height: 0;
+  overflow: hidden;
+  background-color: #e8e8e8;
+  transition: max-height 0.3s ease-out, padding 0.3s ease;
+  padding: 0 15px;
+  font-size: 14px;
+  color: #2c2c2c;
+}
+
+.shelf-description.expanded {
+  max-height: 200px;
+  padding: 10px 15px;
+}
+
+.add-shelf-button {
+  margin-top: auto;
+  text-align: left;
+  color: #333;
+  padding: 15px;
+  border: none;
+  background-color: transparent;
+  cursor: pointer;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  transition: background-color 0.3s ease;
+}
+
+.add-shelf-button:hover {
+  background-color: #e0e0e0;
+}
+
+/* Scrollbar styling */
+.side-navbar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.side-navbar::-webkit-scrollbar-track {
+  background: #f0f0f0;
+}
+
+.side-navbar::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 4px;
+}
+
+.side-navbar::-webkit-scrollbar-thumb:hover {
+  background: #999;
+}
