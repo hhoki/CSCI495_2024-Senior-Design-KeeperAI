@@ -79,9 +79,6 @@
 ## About The Project
 
 
-
-Here's a blank template to get started: To avoid retyping too much info. Do a search and replace with your text editor for the following: `hhoki`, `CSCI495_2024-Senior-Design-KeeperAI`, `twitter_handle`, `henry-joyner-438a39336`, `email_client`, `email`, `project_title`, `project_description`
-
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
